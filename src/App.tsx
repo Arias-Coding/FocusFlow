@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { ThemeProvider } from "@/components/context/theme-provider";
-import { CalendarDemo } from "./components/calendar";
+import { CalendarDemo } from "./components/Calendar";
 import { Pomodoro } from "./components/Pomodoro";
 import { FloatingNav } from "./components/FloatingNav";
 import TaskList from "./components/TaskList";
 
 // - Agregar mini animacion de confeti en el cursor al completar una tarea
 // - Agregar seccion de musica zen (brown noise, rain, fire)
-// - Agregar sonidos: campana al pomodoro, click al navbar, check al tasklist
 // - Títulos de Pestaña Dinámicos (document.title) ((24:10) Enfoque...)
 // - Color de la app dependiendo el estado (default, work, break)
 // - Asignar Tarea al Pomodoro

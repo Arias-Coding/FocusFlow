@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Plus, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
+import useSound from "use-sound";
+import checkSound from "@/components/assets/sounds/pop-sound.mp3";
+import deleteSound from "@/components/assets/sounds/del-pop.mp3";
+import bellSound from "@/components/assets/sounds/notification-bell-sound.mp3";
 
 interface Task {
   id: number;
@@ -16,6 +20,10 @@ export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
 
+  const [playComplete] = useSound(checkSound, { volume: 0.5 });
+  const [playDelete] = useSound(deleteSound, { volume: 0.3 });
+  const [playAdd] = useSound(bellSound, { volume: 0.3 });
+
   const addTask = () => {
     if (newTask.trim() === "") return;
     const task: Task = {
@@ -24,17 +32,32 @@ export function TaskList() {
       completed: false,
     };
     setTasks([task, ...tasks]);
+    playAdd();
     setNewTask("");
   };
 
   const toggleTask = (id: number) => {
     setTasks(
-      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      tasks.map((t) => {
+        if (t.id === id) {
+          const nextState = !t.completed;
+
+          if (nextState) {
+            playComplete();
+          } else {
+            playDelete();
+          }
+
+          return { ...t, completed: nextState };
+        }
+        return t;
+      })
     );
   };
 
   const deleteTask = (id: number) => {
     setTasks(tasks.filter((t) => t.id !== id));
+    playDelete();
   };
 
   return (
