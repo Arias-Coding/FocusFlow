@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Trash2, Plus, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import useSound from "use-sound";
-import checkSound from "@/components/assets/sounds/pop-sound.mp3";
-import deleteSound from "@/components/assets/sounds/del-pop.mp3";
-import bellSound from "@/components/assets/sounds/notification-bell-sound.mp3";
+import checkSound from "@/assets/sounds/pop-sound.mp3";
+import deleteSound from "@/assets/sounds/del-pop.mp3";
+import bellSound from "@/assets/sounds/notification-bell-sound.mp3";
 
 interface Task {
   id: number;

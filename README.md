@@ -25,7 +25,7 @@ Una suite de productividad minimalista y de alto rendimiento diseñada para opti
 1. **Clonar el repositorio**:
 
 ```bash
-git clone https://github.com/ /focus-flow.git
+git clone https://github.com/Arias-Coding/focus-flow.git
 cd focus-flow
 
 ```
