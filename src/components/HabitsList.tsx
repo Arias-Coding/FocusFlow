@@ -163,7 +163,7 @@ export function HabitsList() {
         ) : (
           habits.map((habit) => {
             // Cálculo de porcentaje de la semana (ejemplo visual)
-            const weeklyProgress = (habit.completedDays.length % 7) * 14.2;
+            //            const weeklyProgress = (habit.completedDays.length % 7) * 14.2;
 
             return (
               <Card
