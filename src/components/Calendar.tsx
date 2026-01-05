@@ -14,7 +14,7 @@ export function CalendarDemo() {
   }
 
   return (
-    <div className="container mx-auto py-20 xl:max-w-6xl">
+    <div className="container mx-auto py-20 xl:max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <h2 className="text-6xl font-black text-center mb-12">{currentYear}</h2>
       <div className="flex justify-center flex-wrap gap-6">
         {months.map((monthDate, index) => {

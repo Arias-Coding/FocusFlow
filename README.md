@@ -1,83 +1,62 @@
-# FocusFlow: Productivity Suite
+# FocusFlow: Productivity Suite 🚀
 
-Una suite de productividad minimalista y de alto rendimiento diseñada para optimizar el flujo de trabajo personal. Este proyecto integra herramientas esenciales —Pomodoro, Gestión de Tareas y Seguimiento de Calendario— en una experiencia de usuario fluida y cohesiva, priorizando la velocidad de ejecución y una estética moderna de "dark mode".
+Una suite de productividad de alto rendimiento diseñada bajo la filosofía de "Deep Work". Este proyecto integra herramientas esenciales —Pomodoro, Notas Markdown, Gestión de Tareas y Seguimiento de Hábitos— en una experiencia de usuario fluida y moderna, priorizando el **minimalismo**, la **velocidad de ejecución** y una estética profesional de **cristalismo (glassmorphism)**.
+
+## ✨ Novedades de la Versión Actual
+
+- **Editor de Notas Markdown "Obsidian-Style"**: Sistema de toma de notas con soporte GFM (GitHub Flavored Markdown), previsualización en tiempo real y tipografía optimizada para lectura prolongada.
+- **Tracker de Hábitos Visual**: Registro de constancia con cálculo de rachas (streaks) y visualización de los últimos 7 días para fomentar la disciplina diaria.
+- **Arquitectura de Micro-Interacciones**: Implementación de animaciones de entrada (`animate-in`), transiciones de opacidad y feedback sonoro coordinado para una experiencia inmersiva.
 
 ## 🚀 Key Features
 
-- **Sistema Pomodoro Inteligente**: Temporizador de enfoque y descanso con transiciones automáticas, feedback visual mediante barras de progreso dinámicas y alertas sonoras para maximizar la concentración.
-- **Gestión de Tareas con Feedback Háptico-Visual**: Lista de tareas reactiva que utiliza sonidos personalizados (`use-sound`) y micro-animaciones para validar la compleción de objetivos.
-- **Visualizador Anual de Progreso**: Un componente de calendario avanzado y personalizado que permite visualizar el año completo, utilizando lógica de fechas para diferenciar el pasado del presente de forma intuitiva.
-- **Navegación Flotante Contextual**: Interfaz de navegación con efectos de desenfoque de fondo (glassmorphism) que optimiza el espacio de trabajo y mejora la inmersión del usuario.
-- **Diseño Adaptativo y Accesible**: UI totalmente responsiva construida sobre un sistema de diseño consistente (Shadcn UI), garantizando accesibilidad y estética en cualquier dispositivo.
+- **Sistema Pomodoro Inteligente**: Temporizador con transiciones automáticas entre Enfoque y Descanso, visualizado mediante un anillo de progreso SVG dinámico y efectos de brillo (glow) reactivos.
+- **Gestión de Tareas con Feedback Multi-sensorial**: Lista de tareas reactiva que utiliza sonidos pop/delete y micro-animaciones para validar objetivos cumplidos.
+- **Navegación Flotante Inteligente**: Barra de navegación con desenfoque de fondo (`backdrop-blur`) y estados activos resaltados que optimiza el espacio útil de la pantalla.
+- **Visualizador de Calendario**: Componente de alta densidad informativa para la gestión temporal y visualización anual.
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React 18+, Vite (Arquitectura de alto rendimiento)
-- **Styling**: TailwindCSS (Utility-first CSS)
-- **Componentes**: Shadcn UI (Basado en Radix UI para máxima accesibilidad)
-- **Gestión de Fechas**: Date-fns (Lógica de manipulación temporal robusta)
-- **Tipado**: TypeScript (Desarrollo seguro y mantenible)
-- **Multimedia**: Use-sound para una experiencia de usuario enriquecida (Audio Feedback)
-- **Iconografía**: Lucide React (Icons consistentes y ligeros)
-
-## 📦 Quick Start
-
-1. **Clonar el repositorio**:
-
-```bash
-git clone https://github.com/Arias-Coding/focus-flow.git
-cd focus-flow
-
-```
-
-2. **Instalar dependencias**:
-
-```bash
-npm install
-# o
-pnpm install
-
-```
-
-3. **Ejecutar en entorno de desarrollo**:
-
-```bash
-npm run dev
-
-```
+- **Frontend**: React 18+, Vite
+- **Styling**: TailwindCSS (Utility-first CSS) & Tailwind-animate
+- **Componentes**: Shadcn UI (Radix UI)
+- **Procesamiento Markdown**: React-markdown & Remark-GFM
+- **Multimedia**: Use-sound para feedback auditivo (Audio UX)
+- **Tipado**: TypeScript (Desarrollo robusto y escalable)
+- **Iconografía**: Lucide React
 
 ## 🏗 Project Structure
 
-```
+```text
 src/
 ├── components/
-│   ├── context/        # Contexto de la aplicacion
-│   ├── ui/             # Componentes base de Shadcn (Button, Card, Input, etc.)
-│   ├── Calendar.tsx    # Lógica de visualización anual y date-fns
-│   ├── Pomodoro.tsx    # Máquina de estados del temporizador
-│   ├── TaskList.tsx    # Gestión de tareas y feedback sonoro
-│   └── FloatingNav.tsx # Sistema de navegación persistente
-├── assets/sounds        # Recursos de audio
-├── lib/                # Utilidades de configuración (Tailwind merge, etc.)
-└── App.tsx             # Orquestador principal de la aplicación
+│   ├── ui/             # Componentes base (Button, Card, Textarea, etc.)
+│   ├── Pomodoro.tsx    # Lógica de estados y temporizador circular
+│   ├── Notes.tsx       # Editor Markdown con Preview dual y Sidebar
+│   ├── TaskList.tsx    # Gestión de To-Dos y feedback sonoro
+│   ├── HabitsList.tsx  # Sistema de seguimiento de rachas y hábitos
+│   ├── Calendar.tsx    # Visualización de fechas y calendario anual
+│   └── FloatingNav.tsx # Navegación contextual persistente
+├── assets/             # Recursos de audio (.mp3) y multimedia
+├── lib/utils.ts        # Utilidades de Tailwind (clsx + tailwind-merge)
+└── App.tsx             # Orquestador dinámico de secciones
 
 ```
 
-## 🎯 Core Logic Highlights
+## 🎯 Lógica Destacada
 
-- **Precisión del Timer**: Implementación de limpieza de intervalos en el ciclo de vida de React para prevenir fugas de memoria y asegurar la precisión del tiempo.
-- **Conditional Styling**: Uso extensivo de la utilidad `cn` para el manejo dinámico de clases de Tailwind según el estado de la aplicación.
-- **State Composition**: Gestión eficiente del estado local para asegurar que cada herramienta funcione de forma independiente sin renders innecesarios.
+- **Refinamiento de Renderizado**: Uso de estados locales optimizados para el cambio de modos (Editor vs Preview) sin recargas de página.
+- **Estética "Glass"**: Aplicación de capas de transparencia y bordes definidos (`border-white/5`) para lograr una interfaz moderna y limpia.
+- **Responsive Design**: Adaptación de componentes complejos (como el sidebar de notas y el tracker de hábitos) para mantener la funcionalidad en diversos tamaños de ventana.
 
 ## 🔮 Future Roadmap
 
-Para elevar la aplicación a un nivel de producto comercial, se planean las siguientes implementaciones:
-
-- **Persistencia con LocalStorage**: Implementar un sistema de guardado automático para que las tareas y configuraciones persistan tras recargar la página.
-- **Títulos de Pestaña Dinámicos**: Actualizar el `document.title` en tiempo real para mostrar el progreso del Pomodoro fuera de la aplicación.
-- **Personalización de Temas**: Añadir variaciones estéticas como "Bosque" o "Océano" utilizando variables de CSS y el ThemeProvider.
-- **Análisis de Datos**: Gráficas de productividad para visualizar las sesiones de enfoque completadas durante la semana.
+- [ ] **Persistencia Local (LocalStorage)**: Guardado automático de notas y tareas para mantener la sesión del usuario.
+- [ ] **Ambient Soundscape**: Integración de sonidos de ambiente (lluvia, ruido blanco, fuego) para mejorar la concentración.
+- [ ] **Sistema de Confeti**: Micro-animación al completar todas las tareas diarias o rachas de hábitos.
 
 ---
 
-Desarrollado con enfoque en la **Calidad de Código** y **User Experience**. Este proyecto demuestra competencia en el manejo del ecosistema moderno de React y el diseño de interfaces profesionales.
+Desarrollado con enfoque en la **Calidad de Código** y **User Experience**. FocusFlow demuestra la capacidad de crear herramientas complejas con una UI intuitiva y un rendimiento excepcional.
+
+---
