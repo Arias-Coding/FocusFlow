@@ -70,157 +70,171 @@ export function Pomodoro() {
   };
 
   return (
-    <div className="relative flex items-center justify-center p-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* SVG del Círculo */}
-      <svg
-        width="500"
-        height="500"
-        viewBox="0 0 400 400"
-        className="absolute -rotate-90 transform"
-      >
-        <circle
-          cx="200"
-          cy="200"
-          r={radius}
-          stroke="currentColor"
-          strokeWidth="10"
-          fill="transparent"
-          className="text-muted/10"
-        />
-        <circle
-          cx="200"
-          cy="200"
-          r={radius}
-          stroke={isBreak ? "#22c55e" : "#a855f7"}
-          strokeWidth="12"
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          style={{
-            transition: isActive
-              ? "stroke-dashoffset 1s linear"
-              : "stroke-dashoffset 0.5s ease",
-          }}
+    <div className="relative flex flex-col items-center justify-center min-h-[600px] p-6 lg:p-20 animate-in fade-in zoom-in duration-1000">
+      {/* Contenedor del Círculo Maestro */}
+      <div className="relative flex items-center justify-center">
+        {/* Resplandor de Fondo Dinámico */}
+        <div
           className={cn(
-            isBreak
-              ? "drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]"
-              : "drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"
+            "absolute inset-0 blur-[100px] opacity-20 transition-colors duration-1000",
+            isBreak ? "bg-green-500" : "bg-purple-600"
           )}
         />
-      </svg>
 
-      {/* Botón de Configuración Flotante (Esquina superior derecha del círculo) */}
-      <div className="absolute top-10 right-10 z-20">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:rotate-90 transition-transform duration-500"
-            >
-              <Settings2 className="h-6 w-6 text-muted-foreground" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-82 rounded-3xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">
-                Ajustes del Timer
-              </DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-6 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="work" className="text-sm font-medium">
-                  Tiempo de Enfoque (min)
-                </Label>
-                <Input
-                  id="work"
-                  type="number"
-                  value={workMinutes}
-                  onChange={(e) => setWorkMinutes(Number(e.target.value))}
-                  className="rounded-xl border-2 focus-visible:ring-purple-500"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="break" className="text-sm font-medium">
-                  Tiempo de Descanso (min)
-                </Label>
-                <Input
-                  id="break"
-                  type="number"
-                  value={breakMinutes}
-                  onChange={(e) => setBreakMinutes(Number(e.target.value))}
-                  className="rounded-xl border-2 focus-visible:ring-green-500"
-                />
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Contenido Central */}
-      <Card className="z-10 w-full max-w-sm border-none bg-transparent shadow-none">
-        <CardHeader className="pb-2 text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground">
-            {isBreak ? (
-              <>
-                <Coffee className="h-4 w-4 text-green-500" /> Descanso
-              </>
-            ) : (
-              <>
-                <Brain className="h-4 w-4 text-purple-500" /> Enfoque
-              </>
+        {/* SVG del Círculo de Progreso */}
+        <svg
+          width="450"
+          height="450"
+          viewBox="0 0 400 400"
+          className="absolute -rotate-90 transform drop-shadow-2xl"
+        >
+          {/* Círculo de Fondo (Track) */}
+          <circle
+            cx="200"
+            cy="200"
+            r={radius}
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="transparent"
+            className="text-muted/5"
+          />
+          {/* Círculo de Progreso Activo */}
+          <circle
+            cx="200"
+            cy="200"
+            r={radius}
+            stroke={isBreak ? "#22c55e" : "#a855f7"}
+            strokeWidth="10"
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{
+              transition: isActive
+                ? "stroke-dashoffset 1s linear, stroke 0.5s ease"
+                : "stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease",
+            }}
+            className={cn(
+              "transition-all duration-500",
+              isBreak
+                ? "drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]"
+                : "drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]"
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center space-y-8">
-          <div className="flex flex-col items-center">
-            <span className="text-8xl font-light tabular-nums tracking-tighter">
-              {formatTime(timeLeft)}
-            </span>
+          />
+        </svg>
+
+        {/* Disco Central (Interface) */}
+        <Card className="z-10 w-[320px] h-[320px] rounded-full border border-white/10 bg-card/20 backdrop-blur-2xl shadow-[inset_0_0_40px_rgba(255,255,255,0.05)] flex flex-col items-center justify-center overflow-hidden">
+          {/* Indicador de Estado Superior */}
+          <div className="absolute top-12 left-0 right-0 flex justify-center">
             <div
               className={cn(
-                "mt-4 rounded-full px-4 py-1 text-xs font-bold tracking-widest uppercase animate-pulse",
+                "flex items-center gap-2 px-4 py-1 rounded-full border backdrop-blur-md transition-all duration-500",
                 isBreak
-                  ? "bg-green-500/10 text-green-500"
-                  : "bg-purple-500/10 text-purple-500"
+                  ? "bg-green-500/10 border-green-500/20 text-green-500"
+                  : "bg-purple-500/10 border-purple-500/20 text-purple-500"
               )}
             >
-              {Math.ceil(progress)}% Restante
+              {isBreak ? (
+                <Coffee className="h-3 w-3" />
+              ) : (
+                <Brain className="h-3 w-3" />
+              )}
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                {isBreak ? "Descanso" : "Enfoque"}
+              </span>
             </div>
           </div>
 
-          <div className="flex w-full justify-center gap-4">
-            <Button
-              size="lg"
-              onClick={toggleTimer}
-              className={cn(
-                "w-36 rounded-full font-bold shadow-xl transition-all hover:scale-105 active:scale-95",
-                isBreak
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-purple-600 hover:bg-purple-700",
-                isActive && "bg-muted text-muted-foreground hover:bg-muted/80"
-              )}
-            >
-              {isActive ? (
-                <Pause className="mr-2 h-5 w-5" />
-              ) : (
-                <Play className="mr-2 h-5 w-5" />
-              )}
-              {isActive ? "Pausar" : "Iniciar"}
-            </Button>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={resetTimer}
-              className="h-12 w-12 rounded-full border-2 transition-all hover:rotate-180 active:scale-90"
-            >
-              <RotateCcw className="h-5 w-5" />
-            </Button>
+          {/* Reloj Principal */}
+          <div className="flex flex-col items-center justify-center space-y-1">
+            <span className="text-7xl lg:text-8xl font-thin tabular-nums tracking-tighter text-foreground drop-shadow-sm">
+              {formatTime(timeLeft)}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-muted-foreground/60 tracking-widest uppercase">
+                {Math.ceil(progress)}% Completado
+              </span>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Botón de Configuración Integrado */}
+          <div className="absolute bottom-10">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full h-10 w-10 hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground"
+                >
+                  <Settings2 className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xs border-none bg-card/95 backdrop-blur-2xl rounded-[32px] shadow-3xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold tracking-tight text-center">
+                    Configuración
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-5 py-4">
+                  <div className="space-y-3">
+                    <Label className="text-xs font-bold uppercase tracking-wider px-1">
+                      Enfoque (min)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={workMinutes}
+                      onChange={(e) => setWorkMinutes(Number(e.target.value))}
+                      className="rounded-2xl border-none bg-muted/50 h-12 focus-visible:ring-purple-500/50"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-xs font-bold uppercase tracking-wider px-1">
+                      Descanso (min)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={breakMinutes}
+                      onChange={(e) => setBreakMinutes(Number(e.target.value))}
+                      className="rounded-2xl border-none bg-muted/50 h-12 focus-visible:ring-green-500/50"
+                    />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </Card>
+      </div>
+
+      {/* Controles Principales (Debajo del círculo) */}
+      <div className="mt-12 flex items-center gap-6">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={resetTimer}
+          className="h-14 w-14 rounded-full border-border/40 hover:bg-muted/50 transition-all hover:rotate-[-90deg]"
+        >
+          <RotateCcw className="h-6 w-6 text-muted-foreground" />
+        </Button>
+        <Button
+          size="lg"
+          onClick={toggleTimer}
+          className={cn(
+            "h-20 w-20 rounded-full shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-background",
+            isBreak
+              ? "bg-green-600 hover:bg-green-700 shadow-green-500/20"
+              : "bg-purple-600 hover:bg-purple-700 shadow-purple-500/20",
+            isActive && "bg-foreground text-background hover:bg-foreground/90"
+          )}
+        >
+          {isActive ? (
+            <Pause className="h-8 w-8 fill-current" />
+          ) : (
+            <Play className="h-8 w-8 fill-current ml-1" />
+          )}
+        </Button>
+        <div className="w-14 h-14" /> {/* Espaciador para equilibrio visual */}
+      </div>
     </div>
   );
 }

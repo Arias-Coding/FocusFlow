@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,77 +109,121 @@ export function TaskList() {
     );
 
   return (
-    <Card className="w-full max-w-md shadow-lg border-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-          <ListChecks className="text-primary w-6 h-6" />
-          Tareas
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Input estándar */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="Nueva tarea..."
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addTask()}
-            className="bg-muted/50"
-          />
-          <Button onClick={addTask} size="icon">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Lista de tareas */}
-        <div className="space-y-2 max-h-90 overflow-y-auto pr-1">
-          {tasks.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8 text-sm">
-              No hay tareas pendientes.
-            </p>
-          ) : (
-            tasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between p-3 rounded-md border bg-card group"
-              >
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={task.completed}
-                    onCheckedChange={() => toggleTask(task.id)}
-                    className="hover:cursor-pointer"
-                  />
-                  <span
-                    className={cn(
-                      "text-sm font-medium transition-all",
-                      task.completed && "line-through text-muted-foreground"
-                    )}
-                  >
-                    {task.text}
-                  </span>
+    <div className="w-full max-w-4xl mx-auto p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+      <Card className="border-none bg-card/40 backdrop-blur-xl shadow-3xl rounded-[32px] lg:rounded-[45px] overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col lg:flex-row">
+            {/* Panel Izquierdo: Control y Estadísticas */}
+            <div className="w-full lg:w-[300px] bg-muted/30 p-8 border-b lg:border-b-0 lg:border-r border-border/50 space-y-8">
+              <div className="space-y-2">
+                <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+                  <ListChecks className="text-primary w-6 h-6" />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteTask(task.id)}
-                  className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity hover:cursor-pointer"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <h2 className="text-3xl font-black tracking-tighter">Tareas</h2>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground opacity-70">
+                  Gestión de objetivos
+                </p>
               </div>
-            ))
-          )}
-        </div>
 
-        {/* Footer discreto */}
-        {tasks.length > 0 && (
-          <div className="pt-4 border-t text-[10px] uppercase tracking-widest text-muted-foreground flex justify-between font-bold">
-            <span>Total: {tasks.length}</span>
-            <span>Completas: {tasks.filter((t) => t.completed).length}</span>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+                <div className="bg-background/50 p-4 rounded-2xl border border-border/50">
+                  <span className="text-2xl font-black text-primary">
+                    {tasks.length}
+                  </span>
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Totales
+                  </p>
+                </div>
+                <div className="bg-background/50 p-4 rounded-2xl border border-border/50">
+                  <span className="text-2xl font-black text-green-500">
+                    {tasks.filter((t) => t.completed).length}
+                  </span>
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                    Listas
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Panel Derecho: Lista Dinámica */}
+            <div className="flex-1 p-6 lg:p-10 space-y-8">
+              {/* Input de Alta Fidelidad */}
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative flex gap-3 bg-background rounded-2xl p-2 border border-border/50 shadow-sm">
+                  <Input
+                    placeholder="¿Qué sigue en tu lista?..."
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addTask()}
+                    className="bg-transparent border-none focus-visible:ring-0 text-base placeholder:italic"
+                  />
+                  <Button
+                    onClick={addTask}
+                    className="rounded-xl px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                  >
+                    <Plus className="h-5 w-5 mr-1" />
+                    <span className="hidden sm:inline">Añadir</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Renderizado de Tareas */}
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                {tasks.length === 0 ? (
+                  <div className="text-center py-20 opacity-20 flex flex-col items-center">
+                    <ListChecks className="h-16 w-16 mb-4" />
+                    <p className="font-medium italic">
+                      Tu lista está despejada
+                    </p>
+                  </div>
+                ) : (
+                  tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className={cn(
+                        "group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300",
+                        task.completed
+                          ? "bg-muted/20 border-transparent opacity-60"
+                          : "bg-card border-border/50 hover:border-primary/30 shadow-sm hover:shadow-md"
+                      )}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="relative flex items-center justify-center">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={() => toggleTask(task.id)}
+                            className="h-6 w-6 rounded-lg border-2 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all"
+                          />
+                        </div>
+                        <span
+                          className={cn(
+                            "text-base font-semibold transition-all duration-500",
+                            task.completed &&
+                              "line-through text-muted-foreground italic decoration-primary/30"
+                          )}
+                        >
+                          {task.text}
+                        </span>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteTask(task.id)}
+                        className="h-10 w-10 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 lg:opacity-0 lg:group-hover:opacity-100 transition-all"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

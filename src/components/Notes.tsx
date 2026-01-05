@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { StickyNote, Eye, Edit3, Plus, Trash2, Hash } from "lucide-react";
+import {
+  StickyNote,
+  Eye,
+  Edit3,
+  Plus,
+  Trash2,
+  Hash,
+  ChevronLeft,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
@@ -192,135 +200,216 @@ export function Notes() {
     );
 
   return (
-    <div className="w-full max-w-6xl mx-auto h-195 flex gap-8 p-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-      {/* Sidebar Refinado */}
-      <aside className="w-[320px] flex flex-col gap-8 h-full">
-        <div className="flex items-center justify-between px-3">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/20 p-2 rounded-xl">
-              <StickyNote className="text-primary h-5 w-5" />
+    <div className="w-full max-w-7xl mx-auto h-auto lg:h-[85vh] flex flex-col lg:flex-row gap-0 lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700">
+      {/* SIDEBAR: Estilo Panel de Control */}
+      <aside
+        className={cn(
+          "w-full lg:w-[380px] flex flex-col bg-background lg:bg-transparent border-b lg:border-none",
+          selectedId ? "hidden lg:flex" : "flex"
+        )}
+      >
+        <div className="p-6 lg:p-0 space-y-6 flex flex-col h-full">
+          {/* Header del Sidebar */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                Notas
+              </h2>
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {notes.length} Documentos guardados
+              </p>
             </div>
-            <h2 className="text-xl font-bold tracking-tight">Mis Notas</h2>
-          </div>
-          <Button
-            onClick={addNote}
-            size="icon"
-            className="rounded-xl h-9 w-9 shadow-lg hover:scale-105 transition-transform"
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto space-y-3 px-1 custom-scrollbar">
-          {notes.map((note) => (
-            <div
-              key={note.id}
-              onClick={() => setSelectedId(note.id)}
-              className={cn(
-                "group relative w-full p-4 rounded-2xl transition-all border cursor-pointer",
-                selectedId === note.id
-                  ? "bg-card border-primary/50 shadow-md shadow-primary/5"
-                  : "bg-transparent border-transparent hover:bg-card/50 hover:border-border"
-              )}
+            <Button
+              onClick={addNote}
+              className="rounded-2xl h-11 w-11 shadow-xl bg-primary hover:bg-primary/90 transition-all hover:rotate-90"
             >
-              <div className="flex-1 truncate pr-6">
-                <h3
-                  className={cn(
-                    "font-semibold truncate text-[15px]",
-                    selectedId === note.id ? "text-primary" : "text-foreground"
-                  )}
-                >
-                  {note.title || "Sin título"}
-                </h3>
-                <span className="text-[10px] font-bold text-muted-foreground tracking-widest mt-2 block opacity-50">
-                  {note.date}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => deleteNote(note.id, e)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 h-7 w-7 text-muted-foreground hover:text-destructive transition-all"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <Plus className="h-6 w-6" />
+            </Button>
+          </div>
+
+          {/* Buscador o Filtro (Espacio para futura funcionalidad) */}
+          <div className="relative px-1">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
             </div>
-          ))}
+            <div className="w-full h-10 bg-muted/30 rounded-xl border border-border/50" />
+          </div>
+
+          {/* Lista de Notas */}
+          <div className="flex-1 overflow-y-auto space-y-2 px-1 custom-scrollbar pr-2">
+            {notes.map((note) => (
+              <div
+                key={note.id}
+                onClick={() => setSelectedId(note.id)}
+                className={cn(
+                  "group relative w-full p-5 rounded-[22px] transition-all duration-300 border",
+                  selectedId === note.id
+                    ? "bg-card border-primary/40 shadow-xl shadow-primary/5 ring-1 ring-primary/10"
+                    : "bg-transparent border-transparent hover:bg-muted/30"
+                )}
+              >
+                <div className="space-y-2">
+                  <h3
+                    className={cn(
+                      "font-bold truncate text-[16px] transition-colors",
+                      selectedId === note.id
+                        ? "text-primary"
+                        : "text-foreground/80"
+                    )}
+                  >
+                    {note.title || "Documento sin nombre"}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground/60 bg-muted px-2 py-0.5 rounded-md">
+                      {note.date}
+                    </span>
+                    <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                    <span className="text-[10px] text-muted-foreground/50 italic">
+                      {note.content?.length || 0} caracteres
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => deleteNote(note.id, e)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 lg:group-hover:opacity-100 h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all rounded-full"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </aside>
 
-      {/* Editor Principal Refinado */}
-      <Card className="flex-1 border border-border/50 bg-card/30 backdrop-blur-md shadow-2xl rounded-[32px] flex flex-col overflow-hidden">
+      {/* EDITOR: Estilo "Canvas" Ancho */}
+      <Card
+        className={cn(
+          "flex-1 border-none lg:border border-border/40 bg-card/40 backdrop-blur-xl shadow-3xl lg:rounded-[40px] flex flex-col overflow-hidden transition-all duration-500",
+          !selectedId ? "hidden lg:flex" : "flex"
+        )}
+      >
         {activeNote ? (
           <>
-            <div className="flex items-center justify-between px-10 py-5 border-b border-border/40 bg-muted/10">
-              <div className="flex bg-muted/50 p-1.5 rounded-xl border border-border/50">
+            {/* Toolbar Superior */}
+            <header className="flex items-center justify-between px-6 lg:px-10 py-5 border-b border-border/10 bg-background/20">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedId(null)}
+                className="lg:hidden rounded-full border-border/50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              <div className="flex bg-muted/40 p-1 rounded-2xl border border-border/20 shadow-inner">
                 <Button
-                  variant="ghost" // Usamos ghost como base
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("preview")}
                   className={cn(
-                    "rounded-lg h-8 px-4 font-semibold text-xs transition-all",
+                    "rounded-xl h-9 px-6 font-bold text-xs transition-all",
                     viewMode === "preview"
-                      ? "bg-card text-foreground shadow-sm" // Estilos activos: fondo de tarjeta y sombra
-                      : "text-muted-foreground hover:bg-transparent hover:text-foreground" // Estilos inactivos
+                      ? "bg-card text-primary shadow-md"
+                      : "text-muted-foreground"
                   )}
                 >
-                  <Eye className="h-3.5 w-3.5 mr-2" /> Preview
+                  Lectura
                 </Button>
-
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("edit")}
                   className={cn(
-                    "rounded-lg h-8 px-4 font-semibold text-xs transition-all",
+                    "rounded-xl h-9 px-6 font-bold text-xs transition-all",
                     viewMode === "edit"
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-transparent hover:text-foreground"
+                      ? "bg-card text-primary shadow-md"
+                      : "text-muted-foreground"
                   )}
                 >
-                  <Edit3 className="h-3.5 w-3.5 mr-2" /> Editar
+                  Escritura
                 </Button>
               </div>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
-              <div className="flex items-center gap-3 mb-8 opacity-40 group hover:opacity-100 transition-opacity">
-                <Hash className="h-6 w-6 text-primary" />
-                <input
-                  type="text"
-                  value={activeNote.title}
-                  onChange={(e) =>
-                    updateNote(activeNote.id, "title", e.target.value)
-                  }
-                  className="text-4xl font-bold bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/20"
-                  placeholder="Título de la nota..."
-                />
+              <div className="hidden lg:flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                  Sincronizado
+                </span>
               </div>
+            </header>
 
-              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                {viewMode === "edit" ? (
-                  <MarkdownEditor
-                    content={activeNote.content}
-                    onChange={(val) =>
-                      updateNote(activeNote.id, "content", val)
-                    }
-                  />
-                ) : (
-                  <MarkdownPreview content={activeNote.content} />
-                )}
+            {/* Lienzo de Escritura */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              <div className="max-w-4xl mx-auto px-8 lg:px-16 py-12 lg:py-20">
+                {/* Cabecera del Documento */}
+                <div className="space-y-6 mb-12">
+                  <div className="flex items-center gap-4 group">
+                    <div className="h-10 w-1 bg-primary/30 group-hover:bg-primary transition-colors rounded-full" />
+                    <input
+                      type="text"
+                      value={activeNote.title}
+                      onChange={(e) =>
+                        updateNote(activeNote.id, "title", e.target.value)
+                      }
+                      className="text-3xl lg:text-5xl font-black bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/10"
+                      placeholder="Título del Proyecto"
+                    />
+                  </div>
+                  <div className="flex items-center gap-6 px-5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
+                        Última edición
+                      </span>
+                      <span className="text-xs font-semibold">
+                        {activeNote.date}
+                      </span>
+                    </div>
+                    <div className="w-px h-8 bg-border/40" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
+                        Formato
+                      </span>
+                      <span className="text-xs font-semibold">
+                        Markdown / UTF-8
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contenido */}
+                <div className="prose prose-stone dark:prose-invert max-w-none animate-in fade-in slide-in-from-bottom-2 duration-1000">
+                  {viewMode === "edit" ? (
+                    <MarkdownEditor
+                      content={activeNote.content}
+                      onChange={(val) =>
+                        updateNote(activeNote.id, "content", val)
+                      }
+                    />
+                  ) : (
+                    <MarkdownPreview content={activeNote.content} />
+                  )}
+                </div>
               </div>
             </div>
           </>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center space-y-4">
-            <div className="bg-muted p-6 rounded-full animate-pulse">
-              <StickyNote className="h-12 w-12 text-muted-foreground/40" />
+          <div className="h-full flex flex-col items-center justify-center space-y-6 p-12 text-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+              <div className="relative bg-card border border-border/50 p-8 rounded-[30px] shadow-2xl">
+                <StickyNote className="h-16 w-16 text-primary/40" />
+              </div>
             </div>
-            <p className="text-muted-foreground font-medium italic">
-              Selecciona una nota de tu colección
-            </p>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold">Tu espacio de pensamiento</h3>
+              <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
+                Selecciona una nota de la izquierda o crea una nueva para
+                empezar a capturar tus ideas.
+              </p>
+            </div>
           </div>
         )}
       </Card>
