@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  StickyNote,
-  Eye,
-  Edit3,
-  Plus,
-  Trash2,
-  Hash,
-  ChevronLeft,
-} from "lucide-react";
+import { StickyNote, Plus, Trash2, ChevronLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
