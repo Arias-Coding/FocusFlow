@@ -122,7 +122,7 @@ export function Pomodoro() {
               <Settings2 className="h-6 w-6 text-muted-foreground" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[325px] rounded-3xl">
+          <DialogContent className="sm:max-w-82 rounded-3xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold">
                 Ajustes del Timer

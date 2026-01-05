@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -192,7 +192,7 @@ export function Notes() {
     );
 
   return (
-    <div className="w-full max-w-6xl mx-auto h-[780px] flex gap-8 p-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="w-full max-w-6xl mx-auto h-195 flex gap-8 p-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
       {/* Sidebar Refinado */}
       <aside className="w-[320px] flex flex-col gap-8 h-full">
         <div className="flex items-center justify-between px-3">

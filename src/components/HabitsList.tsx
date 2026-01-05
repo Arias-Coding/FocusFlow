@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, CheckCircle2, Circle, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import useSound from "use-sound";
-import checkSound from "@/assets/sounds/pop-sound.mp3";
-import deleteSound from "@/assets/sounds/del-pop.mp3";
+/* import checkSound from "@/assets/sounds/pop-sound.mp3";   
+import deleteSound from "@/assets/sounds/del-pop.mp3"; */
 import bellSound from "@/assets/sounds/notification-bell-sound.mp3";
 
 import { useAuth } from "@/components/context/AuthContext";
