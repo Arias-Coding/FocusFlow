@@ -6,6 +6,7 @@ import TaskList from "./components/TaskList";
 import { Notes } from "./components/Notes.tsx";
 import { HabitsList } from "./components/HabitsList";
 import { CalendarDemo } from "./components/Calendar";
+import Settings from "./components/Settings.tsx";
 
 import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import { Login } from "./components/Login";
@@ -26,7 +27,13 @@ import { Login } from "./components/Login";
 //     Tu hábito con la racha más alta.
 // - Sistema de niveles: Ganar "XP" cada vez que completas una tarea o hábito para gamificar tu productividad.
 
-type Section = "Pomodoro" | "Calendar" | "Tasks" | "Habits" | "Notes";
+type Section =
+  | "Pomodoro"
+  | "Calendar"
+  | "Tasks"
+  | "Habits"
+  | "Notes"
+  | "Settings";
 
 const sections = {
   Pomodoro: <Pomodoro />,
@@ -34,6 +41,7 @@ const sections = {
   Tasks: <TaskList />, // Asegúrate de haber importado TaskList
   Habits: <HabitsList />,
   Notes: <Notes />,
+  Settings: <Settings />,
 };
 
 function AppContent() {
@@ -59,9 +67,9 @@ function AppContent() {
 
   // Si hay usuario, mostramos la App normal
   return (
-    <div className="min-h-screen bg-background text-foreground relative">
+    <div className=" bg-background text-foreground relative">
       <main className="min-h-lvh flex items-center justify-center p-4">
-        <div className="min-h-screen bg-background text-foreground relative">
+        <div className=" bg-background text-foreground relative">
           <main className="min-h-lvh flex items-center justify-center p-4">
             {sections[currentSection]}
           </main>
@@ -81,9 +89,15 @@ function AppContent() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const root = window.document.documentElement;
+    console.log("Clases en HTML:", root.classList.value);
+    console.log("Tema en LocalStorage:", localStorage.getItem("vite-ui-theme"));
+  }, []);
+
   return (
     <AuthProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <AppContent />
       </ThemeProvider>
     </AuthProvider>

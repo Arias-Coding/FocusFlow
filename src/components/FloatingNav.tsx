@@ -1,10 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Timer, ListChecks, Zap, StickyNote } from "lucide-react";
+import {
+  Calendar,
+  Timer,
+  ListChecks,
+  Zap,
+  StickyNote,
+  Settings2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type LucideIcon } from "lucide-react";
 
-// 1. Añadimos "Notes" al tipo Section
-type Section = "Pomodoro" | "Calendar" | "Tasks" | "Habits" | "Notes";
+// 1. Añadimos "Settings" al tipo Section
+type Section =
+  | "Pomodoro"
+  | "Calendar"
+  | "Tasks"
+  | "Habits"
+  | "Notes"
+  | "Settings";
 
 interface FloatingNavProps {
   currentSection: Section;
@@ -32,15 +45,15 @@ function NavButton({
       size="sm"
       onClick={() => onClick(id)}
       className={cn(
-        "rounded-full gap-2 transition-all hover:cursor-pointer",
+        "rounded-full gap-2 transition-all hover:cursor-pointer px-3 md:px-4",
         isActive
-          ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-          : "hover:bg-muted"
+          ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg scale-105"
+          : "hover:bg-muted text-muted-foreground"
       )}
     >
-      <Icon className="w-4 h-4" />
+      <Icon className={cn("w-4 h-4", isActive && "animate-pulse")} />
       <span
-        className={cn("text-xs font-medium", !isActive && "hidden md:inline")}
+        className={cn("text-xs font-semibold", !isActive && "hidden md:inline")}
       >
         {label}
       </span>
@@ -54,7 +67,7 @@ export function FloatingNav({
 }: FloatingNavProps) {
   return (
     <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-1 p-2 bg-card/80 backdrop-blur-md border rounded-full shadow-2xl">
+      <div className="flex items-center gap-1 p-2 bg-card/60 backdrop-blur-xl border border-white/10 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
         <NavButton
           id="Pomodoro"
           label="Pomodoro"
@@ -63,7 +76,7 @@ export function FloatingNav({
           onClick={setCurrentSection}
         />
 
-        <div className="w-px h-4 bg-border mx-1" />
+        <div className="w-px h-4 bg-border/50 mx-1" />
 
         <NavButton
           id="Tasks"
@@ -73,7 +86,7 @@ export function FloatingNav({
           onClick={setCurrentSection}
         />
 
-        <div className="w-px h-4 bg-border mx-1" />
+        <div className="w-px h-4 bg-border/50 mx-1" />
 
         <NavButton
           id="Notes"
@@ -83,7 +96,7 @@ export function FloatingNav({
           onClick={setCurrentSection}
         />
 
-        <div className="w-px h-4 bg-border mx-1" />
+        <div className="w-px h-4 bg-border/50 mx-1" />
 
         <NavButton
           id="Habits"
@@ -93,14 +106,24 @@ export function FloatingNav({
           onClick={setCurrentSection}
         />
 
-        {/* 2. Nuevo separador y botón de Notas */}
-        <div className="w-px h-4 bg-border mx-1" />
+        <div className="w-px h-4 bg-border/50 mx-1" />
 
         <NavButton
           id="Calendar"
           label="Calendario"
           icon={Calendar}
           isActive={currentSection === "Calendar"}
+          onClick={setCurrentSection}
+        />
+
+        {/* 2. Sección de Ajustes Final */}
+        <div className="w-px h-4 bg-border/50 mx-1" />
+
+        <NavButton
+          id="Settings"
+          label="Ajustes"
+          icon={Settings2}
+          isActive={currentSection === "Settings"}
           onClick={setCurrentSection}
         />
       </div>

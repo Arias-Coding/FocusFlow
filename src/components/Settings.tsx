@@ -1,0 +1,226 @@
+import { useState } from "react";
+import { account } from "@/lib/appwrite";
+import { useTheme } from "@/components/context/theme-provider"; // Verifica que la ruta sea correcta
+import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import {
+  Bell,
+  Palette,
+  Volume2,
+  ShieldCheck,
+  Moon,
+  Sun,
+  Laptop,
+  Timer as TimerIcon,
+  ChevronRight,
+  Loader2,
+  LogOut,
+} from "lucide-react";
+
+interface SettingsGroupProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function SettingsGroup({ title, children }: SettingsGroupProps) {
+  return (
+    <div className="space-y-4 w-full">
+      <h3 className="text-xs uppercase tracking-[0.15em] font-black text-foreground/60 ml-2">
+        {title}
+      </h3>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function SettingsItem({
+  icon: Icon,
+  label,
+  description,
+  children,
+}: {
+  icon: any;
+  label: string;
+  description?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="group flex items-center justify-between p-5 rounded-[22px] bg-white/[0.05] dark:bg-card/40 border border-white/10 hover:border-white/20 hover:bg-white/[0.08] transition-all duration-200">
+      <div className="flex items-center gap-5">
+        <div className="p-3 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-base font-bold tracking-tight text-foreground">
+            {label}
+          </span>
+          {description && (
+            <span className="text-sm text-foreground/50 font-medium leading-tight">
+              {description}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        {children || (
+          <ChevronRight className="w-5 h-5 text-foreground/20 group-hover:text-foreground/50 transition-colors" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Settings() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { theme, setTheme } = useTheme();
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await account.deleteSession("current");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen pb-32 pt-16 px-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mb-14 space-y-3 ml-2">
+        <h1 className="text-6xl font-black tracking-tighter italic text-foreground">
+          Ajustes
+        </h1>
+        <p className="text-lg text-foreground/60 font-medium">
+          Configura tu estación de trabajo.
+        </p>
+      </div>
+
+      <div className="space-y-12">
+        <SettingsGroup title="Cuenta">
+          <div className="p-6 rounded-[28px] bg-white/[0.05] dark:bg-card border border-white/10 flex items-center justify-between relative group shadow-xl">
+            <div className="flex items-center gap-5 relative z-10">
+              <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-black text-2xl shadow-lg shadow-primary/20">
+                JS
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-black tracking-tight text-foreground">
+                  John Smith
+                </span>
+                <span className="text-sm text-primary font-bold">
+                  Plan Pro • Usuario Activo
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="secondary"
+              className="rounded-xl font-bold px-6 h-11 bg-foreground text-background hover:opacity-90 transition-opacity"
+            >
+              Editar
+            </Button>
+          </div>
+        </SettingsGroup>
+
+        <SettingsGroup title="Productividad">
+          <SettingsItem
+            icon={TimerIcon}
+            label="Auto-iniciar Descansos"
+            description="El temporizador de descanso inicia automáticamente"
+          >
+            <Switch
+              defaultChecked
+              className="data-[state=checked]:bg-primary"
+            />
+          </SettingsItem>
+
+          <SettingsItem
+            icon={Volume2}
+            label="Efectos de Sonido"
+            description="Alertas audibles al finalizar sesiones"
+          >
+            <Switch
+              defaultChecked
+              className="data-[state=checked]:bg-primary"
+            />
+          </SettingsItem>
+        </SettingsGroup>
+
+        {/* GRUPO APARIENCIA - FUNCIONAL */}
+        <SettingsGroup title="Apariencia">
+          <SettingsItem
+            icon={Palette}
+            label="Tema Visual"
+            description="Personaliza cómo se ve tu interfaz"
+          >
+            <div className="flex bg-foreground/[0.05] dark:bg-white/10 p-1 rounded-xl border border-foreground/5">
+              {/* BOTÓN LIGHT */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("light")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "light"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Sun className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN DARK */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("dark")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "dark"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Moon className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN SYSTEM */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("system")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "system"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Laptop className="w-4 h-4" />
+              </Button>
+            </div>
+          </SettingsItem>
+        </SettingsGroup>
+
+        <div className="pt-6">
+          <Button
+            variant="ghost"
+            disabled={isLoading}
+            onClick={handleLogout}
+            className="w-full rounded-2xl text-red-500 hover:text-red-600 hover:bg-red-500/10 font-bold py-7 text-lg border border-foreground/5 transition-all"
+          >
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <>
+                <LogOut className="mr-2 h-5 w-5" /> Cerrar Sesión
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
