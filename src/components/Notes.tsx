@@ -94,14 +94,7 @@ function MarkdownPreview({ content }: { content: string }) {
               {children}
             </blockquote>
           ),
-          code: ({ inline, children }) => {
-            if (inline) {
-              return (
-                <code className="text-primary bg-primary/10 px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono">
-                  {children}
-                </code>
-              );
-            }
+          code: ({ children }) => {
             return <code>{children}</code>;
           },
           pre: ({ children }) => (
