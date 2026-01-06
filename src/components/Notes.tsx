@@ -503,16 +503,6 @@ export function Notes() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
 
-  const [height, setHeight] = useState<number | undefined>();
-
-  useEffect(() => {
-    const contenido = document.getElementById(`${selectedId}`);
-    setHeight(contenido?.scrollHeight);
-
-    const card = document.getElementById(`card`);
-    console.log(card);
-  }, [selectedId]);
-
   // 1. Cargar notas
   useEffect(() => {
     const fetchNotes = async () => {

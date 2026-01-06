@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/context/theme-provider";
-import { SidebarNav } from "./components/FloatingNav";
-import { Pomodoro } from "./components/Pomodoro";
-import TaskList from "./components/TaskList";
+import { SidebarNav } from "./components/FloatingNav.tsx";
+import { Pomodoro } from "./components/Pomodoro.tsx";
+import TaskList from "./components/TaskList.tsx";
 import { Notes } from "./components/Notes.tsx";
-import { HabitsList } from "./components/HabitsList";
-import { CalendarDemo } from "./components/Calendar";
+import { HabitsList } from "./components/HabitsList.tsx";
+import { CalendarDemo } from "./components/Calendar.tsx";
 import Settings from "./components/Settings.tsx";
 
 import { AuthProvider, useAuth } from "./components/context/AuthContext";
-import { Login } from "./components/Login";
-import { Zen } from "./components/Zen";
-import { Dashboard } from "./components/Dashboard";
-import { Goals } from "./components/Goals";
+import { Login } from "./components/Login.tsx";
+import { Zen } from "./components/Zen.tsx";
+import { Dashboard } from "./components/Dashboard.tsx";
+import { Goals } from "./components/Goals.tsx";
 
 type Section =
   | "Dashboard"
