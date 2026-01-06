@@ -12,11 +12,14 @@ import {
   CheckCircle,
   XCircle,
   Lightbulb,
+  Copy,
+  Check,
 } from "lucide-react";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import remarkHighlight from "remark-highlight";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { cn, saveToLocalStorage, loadFromLocalStorage } from "@/lib/utils";
 
 import { useAuth } from "@/components/context/AuthContext"; // Importamos el usuario
@@ -146,6 +149,57 @@ function copyToClipboard(text: string) {
   });
 }
 
+// --- Componente: Bloque de código mejorado ---
+function CodeBlock({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) {
+  const [copied, setCopied] = React.useState(false);
+  const language = className?.replace("language-", "") || "text";
+
+  const handleCopy = () => {
+    copyToClipboard(children);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="my-4 sm:my-6 rounded-lg border border-primary/10 overflow-hidden shadow-lg">
+      <div className="bg-primary/10 px-4 py-2 flex justify-between items-center border-b border-primary/10">
+        <span className="text-xs font-mono text-primary uppercase font-semibold">
+          {language}
+        </span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-primary/20 hover:bg-primary/30 text-primary transition-colors"
+        >
+          {copied ? (
+            <>
+              <Check className="h-3 w-3" /> Copiado
+            </>
+          ) : (
+            <>
+              <Copy className="h-3 w-3" /> Copiar
+            </>
+          )}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        language={language}
+        style={atomDark}
+        className="!bg-zinc-950 !m-0 text-xs sm:text-sm rounded-b-lg"
+        showLineNumbers={true}
+        wrapLongLines={true}
+      >
+        {children}
+      </SyntaxHighlighter>
+    </div>
+  );
+}
+
 // --- Componente: Editor Refinado ---
 function MarkdownEditor({
   content,
@@ -223,7 +277,7 @@ function MarkdownPreview({ content }: { content: string }) {
       md:prose-h1:text-4xl md:prose-h1:text-5xl md:prose-h2:text-3xl md:prose-h3:text-2xl"
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkHighlight]}
+        remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => (
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4 sm:mb-6 pb-2 border-b border-border/50 mt-6 sm:mt-8 first:mt-0">
@@ -261,25 +315,20 @@ function MarkdownPreview({ content }: { content: string }) {
             // Extract text content from code element
             const codeElement = React.Children.toArray(children).find(
               (child) => React.isValidElement(child) && child.type === "code"
-            ) as React.ReactElement<{ children?: React.ReactNode }> | undefined;
+            ) as
+              | React.ReactElement<{
+                  children?: React.ReactNode;
+                  className?: string;
+                }>
+              | undefined;
 
             const codeContent = codeElement?.props?.children
               ? String(codeElement.props.children)
               : String(children);
 
-            return (
-              <pre className="bg-zinc-950 dark:bg-zinc-900 border border-white/5 dark:border-white/10 shadow-2xl rounded-lg p-3 sm:p-4 overflow-x-auto my-4 sm:my-6 text-xs sm:text-sm font-mono relative group">
-                <button
-                  onClick={() => copyToClipboard(codeContent)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-zinc-200 text-xs px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700"
-                >
-                  Copiar
-                </button>
-                <code className="bg-transparent text-zinc-100 dark:text-zinc-200 px-0 py-0 block">
-                  {children}
-                </code>
-              </pre>
-            );
+            const className = codeElement?.props?.className;
+
+            return <CodeBlock className={className}>{codeContent}</CodeBlock>;
           },
           mark: ({ children }) => (
             <mark className="bg-yellow-200 dark:bg-yellow-600/30 text-yellow-900 dark:text-yellow-100 px-1 py-0.5 rounded-sm font-medium">
@@ -296,7 +345,7 @@ function MarkdownPreview({ content }: { content: string }) {
               return (
                 <Callout type={calloutType} title={calloutTitle || undefined}>
                   <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkHighlight]}
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => <>{children}</>,
                       strong: ({ children }) => (
@@ -427,7 +476,7 @@ export function Notes() {
           content: doc.content,
           date: doc.date,
         }));
-        setNotes(formattedNotes);
+        setNotes(formattedNotes.reverse());
         if (formattedNotes.length > 0) setSelectedId(formattedNotes[0].id);
         // Save to localStorage as backup
         saveToLocalStorage("notes", formattedNotes);
@@ -447,7 +496,7 @@ export function Notes() {
   const activeNote = notes.find((n) => n.id === selectedId);
 
   // 2. Lógica de Debounce
-  const debouncedNote = useDebounce(activeNote, 500);
+  const debouncedNote = useDebounce(activeNote, 2000);
 
   useEffect(() => {
     // IMPORTANTE: Solo disparar si la nota tiene ID y no estamos cargando

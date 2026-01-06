@@ -158,15 +158,15 @@ export function HabitsList() {
   return (
     <div className="w-full max-w-5xl mx-auto p-4 lg:p-8 space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       {/* Encabezado Estilo Dashboard */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 px-2">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-400/20 border border-pink-400/30 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-widest">
             <Flame className="h-3 w-3 fill-current" /> En racha
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter">
             Hábitos
           </h2>
-          <p className="text-muted-foreground font-medium italic">
+          <p className="text-muted-foreground font-medium italic text-sm sm:text-base">
             "Somos lo que hacemos repetidamente."
           </p>
         </div>
@@ -176,8 +176,8 @@ export function HabitsList() {
           onOpenChange={setIsTemplateDialogOpen}
         >
           <DialogTrigger asChild>
-            <Button className="rounded-2xl h-14 px-8 bg-purple-600 hover:bg-purple-700 shadow-xl shadow-purple-500/20 transition-all hover:scale-105 active:scale-95 font-bold">
-              <Sparkles className="mr-2 h-5 w-5" /> Nuevo Hábito
+            <Button className="w-full sm:w-auto rounded-2xl h-12 sm:h-14 px-6 sm:px-8 bg-purple-400 hover:bg-purple-500 shadow-xl shadow-purple-400/30 transition-all hover:scale-105 active:scale-95 font-bold text-white text-sm sm:text-base">
+              <Sparkles className="mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Nuevo Hábito
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -190,15 +190,15 @@ export function HabitsList() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6">
               {habitTemplates.map((template, index) => (
                 <Button
                   key={index}
                   variant="outline"
-                  className="h-auto p-4 flex flex-col items-center gap-2 hover:bg-purple-50 dark:hover:bg-purple-950/20 transition-all"
+                  className="h-auto p-3 sm:p-4 flex flex-col items-center gap-2 hover:bg-purple-50 dark:hover:bg-purple-950/20 transition-all text-xs sm:text-sm"
                   onClick={() => addHabit(template.name)}
                 >
-                  <span className="text-2xl">{template.icon}</span>
+                  <span className="text-xl sm:text-2xl">{template.icon}</span>
                   <span className="font-medium text-center">
                     {template.name}
                   </span>
@@ -210,10 +210,10 @@ export function HabitsList() {
 
               <Button
                 variant="outline"
-                className="h-auto p-4 flex flex-col items-center gap-2 border-dashed hover:bg-muted/50 transition-all"
+                className="h-auto p-3 sm:p-4 flex flex-col items-center gap-2 border-dashed hover:bg-muted/50 transition-all text-xs sm:text-sm"
                 onClick={() => addHabit()}
               >
-                <Plus className="text-2xl" />
+                <Plus className="text-xl sm:text-2xl" />
                 <span className="font-medium text-center">Personalizado</span>
                 <span className="text-xs text-muted-foreground">
                   Crea uno propio
@@ -225,10 +225,12 @@ export function HabitsList() {
       </div>
 
       {/* Rejilla de Hábitos */}
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         {habits.length === 0 ? (
-          <div className="text-center py-20 border-2 border-dashed rounded-[40px] opacity-30">
-            <p className="italic">No hay hábitos configurados aún...</p>
+          <div className="text-center py-12 sm:py-20 border-2 border-dashed rounded-[32px] sm:rounded-[40px] opacity-30">
+            <p className="italic text-sm sm:text-base">
+              No hay hábitos configurados aún...
+            </p>
           </div>
         ) : (
           habits.map((habit) => {
@@ -238,19 +240,19 @@ export function HabitsList() {
             return (
               <Card
                 key={habit.id}
-                className="group overflow-hidden border-none bg-card/40 backdrop-blur-xl shadow-2xl rounded-[32px] lg:rounded-[40px] transition-all hover:shadow-purple-500/5"
+                className="group overflow-hidden border-none bg-card/40 backdrop-blur-xl shadow-2xl rounded-[24px] sm:rounded-[32px] lg:rounded-[40px] transition-all hover:shadow-purple-500/5"
               >
-                <CardContent className="p-8 lg:p-10">
-                  <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+                <CardContent className="p-4 sm:p-6 lg:p-8 lg:p-10">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
                     {/* Info del Hábito */}
-                    <div className="space-y-4 flex-1">
+                    <div className="space-y-3 sm:space-y-4 flex-1">
                       <div className="space-y-1">
-                        <h3 className="text-2xl lg:text-3xl font-black tracking-tight group-hover:text-purple-500 transition-colors">
+                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight group-hover:text-purple-500 transition-colors">
                           {habit.name}
                         </h3>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center text-orange-500 font-black text-sm italic">
-                            <Flame className="mr-1 h-5 w-5 fill-current" />
+                        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                          <div className="flex items-center text-pink-500 dark:text-pink-400 font-black text-xs sm:text-sm italic">
+                            <Flame className="mr-1 h-4 sm:h-5 w-4 sm:w-5 fill-current" />
                             <span>{habit.streak} DÍAS</span>
                           </div>
                           <span className="text-xs font-bold text-muted-foreground/40 uppercase tracking-tighter">
@@ -262,7 +264,7 @@ export function HabitsList() {
                       {/* Barra de Progreso Sutil */}
                       <div className="w-full max-w-xs h-1.5 bg-muted/30 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-purple-500 to-orange-500 transition-all duration-1000"
+                          className="h-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-1000"
                           style={{
                             width: `${Math.min(100, habit.streak * 10)}%`,
                           }}
@@ -271,7 +273,7 @@ export function HabitsList() {
                     </div>
 
                     {/* Tracker Semanal */}
-                    <div className="flex items-center justify-between md:justify-end gap-2 lg:gap-4 overflow-x-auto pb-2">
+                    <div className="flex items-center justify-between lg:justify-end gap-1.5 sm:gap-2 lg:gap-3 overflow-x-auto pb-1 sm:pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
                       {lastSevenDays.map((date) => {
                         const isCompleted = habit.completedDays.includes(date);
                         const isToday = date === TODAY_STR;
@@ -284,11 +286,11 @@ export function HabitsList() {
                         return (
                           <div
                             key={date}
-                            className="flex flex-col items-center gap-3"
+                            className="flex flex-col items-center gap-2"
                           >
                             <span
                               className={cn(
-                                "text-[10px] font-black uppercase tracking-widest transition-colors",
+                                "text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors",
                                 isToday
                                   ? "text-purple-500"
                                   : "text-muted-foreground/40"
@@ -300,18 +302,18 @@ export function HabitsList() {
                             <button
                               onClick={() => toggleHabit(habit.id, date)}
                               className={cn(
-                                "h-12 w-12 lg:h-14 lg:w-14 rounded-[18px] lg:rounded-[22px] transition-all duration-500 flex flex-col items-center justify-center border-2 relative group/btn",
+                                "h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-[14px] sm:rounded-[18px] lg:rounded-[22px] transition-all duration-500 flex flex-col items-center justify-center border-2 relative group/btn",
                                 isCompleted
-                                  ? "bg-purple-500 border-purple-400 text-white shadow-lg shadow-purple-500/30 scale-105"
+                                  ? "bg-purple-400 border-purple-300 text-white shadow-lg shadow-purple-400/30 scale-105"
                                   : "bg-background/50 border-border/50 hover:border-purple-300 text-muted-foreground/30",
                                 isToday &&
                                   !isCompleted &&
-                                  "ring-2 ring-purple-500/20 border-purple-500/50"
+                                  "ring-2 ring-purple-400/20 border-purple-400/50"
                               )}
                             >
                               <span
                                 className={cn(
-                                  "text-xs font-bold mb-0.5 transition-colors",
+                                  "text-[9px] sm:text-xs font-bold mb-0.5 transition-colors",
                                   isCompleted
                                     ? "text-white"
                                     : "text-foreground/20"
@@ -320,7 +322,7 @@ export function HabitsList() {
                                 {dayNum}
                               </span>
                               {isCompleted ? (
-                                <CheckCircle2 className="h-4 w-4" />
+                                <CheckCircle2 className="h-3 sm:h-4 w-3 sm:w-4" />
                               ) : (
                                 <div className="h-1 w-1 rounded-full bg-current" />
                               )}

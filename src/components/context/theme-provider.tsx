@@ -93,14 +93,14 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     const accentColors = {
-      blue: "hsl(217.2 91.2% 59.8%)",
-      green: "hsl(142.1 76.2% 36.3%)",
-      purple: "hsl(262.1 83.3% 57.8%)",
-      red: "hsl(0 84.2% 60.2%)",
-      orange: "hsl(24.6 95% 53.1%)",
-      pink: "hsl(316.7 100% 68.8%)",
-      indigo: "hsl(231.4 48.1% 48.3%)",
-      teal: "hsl(173.4 80.4% 40%)",
+      blue: "hsl(210, 40%, 70%)",
+      green: "hsl(120, 30%, 70%)",
+      purple: "hsl(270, 40%, 75%)",
+      red: "hsl(0, 50%, 75%)",
+      orange: "hsl(30, 50%, 70%)",
+      pink: "hsl(330, 50%, 75%)",
+      indigo: "hsl(240, 40%, 70%)",
+      teal: "hsl(180, 40%, 70%)",
     };
 
     root.style.setProperty("--primary", accentColors[accentColor]);

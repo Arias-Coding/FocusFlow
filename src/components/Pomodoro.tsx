@@ -48,17 +48,17 @@ function StatCard({
           color
         )}
       >
-        <Icon className="h-5 w-5" />
+        <Icon className="h-4 sm:h-5 w-4 sm:w-5" />
       </div>
       <div className="flex flex-col">
         <span
           key={value}
-          className="text-2xl font-black tracking-tighter leading-none animate-in zoom-in duration-300"
+          className="text-xl sm:text-2xl font-black tracking-tighter leading-none animate-in zoom-in duration-300"
           style={{ animationDelay: `${delay}ms` }}
         >
           {value}
         </span>
-        <span className="text-[8px] uppercase tracking-[0.2em] font-bold opacity-30 mt-1">
+        <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-bold opacity-30 mt-1">
           {label}
         </span>
       </div>
@@ -228,30 +228,30 @@ export function Pomodoro() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[800px] p-6 lg:p-20 animate-in fade-in zoom-in duration-1000">
       {/* CONTENEDOR DE LA BARRA DE ESTADÍSTICAS */}
-      <div className="w-full max-w-xl px-4 mb-25 relative animate-in slide-in-from-top-8 duration-1000 delay-200">
+      <div className="w-full max-w-xl px-2 sm:px-4 mb-20 sm:mb-25 relative animate-in slide-in-from-top-8 duration-1000 delay-200">
         {/* BOTÓN DE CONFIGURACIÓN FLOTANTE (Fuera del box) */}
-        <div className="absolute -top-3 -right-1 z-20">
+        <div className="absolute -top-3 -right-2 sm:-right-1 z-20">
           <Dialog>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 rounded-xl bg-white/10 dark:bg-card/40 backdrop-blur-md border border-white/20 shadow-xl hover:scale-110 active:scale-95 transition-all group"
+                className="h-9 sm:h-10 w-9 sm:w-10 rounded-xl bg-white/10 dark:bg-card/40 backdrop-blur-md border border-white/20 shadow-xl hover:scale-110 active:scale-95 transition-all group"
               >
-                <Settings2 className="h-4 w-4 text-white/70 group-hover:rotate-90 transition-transform duration-500" />
+                <Settings2 className="h-4 sm:h-5 w-4 sm:w-5 text-white/70 group-hover:rotate-90 transition-transform duration-500" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-card/95 backdrop-blur-2xl border-white/10 rounded-[32px] sm:max-w-[425px]">
+            <DialogContent className="bg-card/95 backdrop-blur-2xl border-white/10 rounded-[32px] w-[90vw] sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black tracking-tighter italic">
+                <DialogTitle className="text-xl sm:text-2xl font-black tracking-tighter italic">
                   Ajustes Focus
                 </DialogTitle>
               </DialogHeader>
-              <div className="grid gap-6 py-6">
-                <div className="space-y-3">
+              <div className="grid gap-4 sm:gap-6 py-4 sm:py-6">
+                <div className="space-y-2 sm:space-y-3">
                   <Label
                     htmlFor="work"
-                    className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-50 ml-1"
+                    className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold opacity-50 ml-1"
                   >
                     Tiempo Enfoque (min)
                   </Label>
@@ -260,13 +260,13 @@ export function Pomodoro() {
                     type="number"
                     value={workMinutes}
                     onChange={(e) => setWorkMinutes(Number(e.target.value))}
-                    className="bg-white/5 border-white/10 rounded-2xl h-12 font-bold focus:ring-purple-500/20"
+                    className="bg-white/5 border-white/10 rounded-2xl h-10 sm:h-12 font-bold focus:ring-purple-500/20 text-sm sm:text-base"
                   />
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <Label
                     htmlFor="break"
-                    className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-50 ml-1"
+                    className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold opacity-50 ml-1"
                   >
                     Tiempo Descanso (min)
                   </Label>
@@ -275,7 +275,7 @@ export function Pomodoro() {
                     type="number"
                     value={breakMinutes}
                     onChange={(e) => setBreakMinutes(Number(e.target.value))}
-                    className="bg-white/5 border-white/10 rounded-2xl h-12 font-bold focus:ring-green-500/20"
+                    className="bg-white/5 border-white/10 rounded-2xl h-10 sm:h-12 font-bold focus:ring-green-500/20 text-sm sm:text-base"
                   />
                 </div>
               </div>
@@ -284,7 +284,7 @@ export function Pomodoro() {
         </div>
 
         {/* LA BARRA (Glassmorphism) */}
-        <div className="bg-white/[0.02] dark:bg-card/20 backdrop-blur-3xl border border-white/10 rounded-[28px] shadow-2xl relative overflow-hidden group">
+        <div className="bg-white/[0.02] dark:bg-card/20 backdrop-blur-3xl border border-white/10 rounded-[24px] sm:rounded-[28px] shadow-2xl relative overflow-hidden group">
           {/* Resplandor interno animado */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:animate-[shimmer_2.5s_infinite] transition-transform" />
 
@@ -293,15 +293,15 @@ export function Pomodoro() {
             className={cn(
               "absolute bottom-0 left-0 h-[2px] transition-all duration-1000 ease-in-out",
               isBreak
-                ? "bg-green-500 shadow-[0_0_10px_#22c55e]"
-                : "bg-purple-500 shadow-[0_0_10px_#a855f7]"
+                ? "bg-teal-400 shadow-[0_0_10px_rgba(45,212,191,0.4)]"
+                : "bg-purple-400 shadow-[0_0_10px_rgba(192,132,250,0.4)]"
             )}
             style={{
               width: `${Math.min(100, (completedSessions / 8) * 100)}%`,
             }}
           />
 
-          <div className="flex items-center justify-between py-5 px-10 relative z-10 gap-8">
+          <div className="flex items-center justify-between py-4 sm:py-5 px-4 sm:px-10 relative z-10 gap-4 sm:gap-8 overflow-x-auto">
             {/* Ciclos */}
             <StatCard
               icon={Brain}
@@ -309,43 +309,43 @@ export function Pomodoro() {
               label="Ciclos"
               color={
                 isBreak
-                  ? "bg-green-500/10 border-green-500/20 text-green-500"
-                  : "bg-purple-500/10 border-purple-500/20 text-purple-500"
+                  ? "bg-green-400/20 border-green-400/30 text-green-500"
+                  : "bg-purple-400/20 border-purple-400/30 text-purple-500"
               }
               delay={0}
             />
 
-            <div className="h-8 w-[1px] bg-white/10" />
+            <div className="h-6 sm:h-8 w-[1px] bg-white/10 hidden sm:block" />
 
             {/* Total */}
             <StatCard
               icon={Timer}
               value={formatTotalTime(totalWorkSeconds)}
               label="Enfoque"
-              color="bg-orange-500/10 border-orange-500/20 text-orange-500"
+              color="bg-pink-400/20 border-pink-400/30 text-pink-500"
               delay={100}
             />
 
-            <div className="h-8 w-[1px] bg-white/10" />
+            <div className="h-6 sm:h-8 w-[1px] bg-white/10 hidden sm:block" />
 
             {/* Pausas */}
             <StatCard
               icon={Coffee}
               value={completedBreaks}
               label="Pausas"
-              color="bg-green-500/10 border-green-500/20 text-green-500"
+              color="bg-teal-400/20 border-teal-400/30 text-teal-500"
               delay={200}
             />
           </div>
         </div>
       </div>
 
-      <div className="relative flex items-center justify-center scale-95 lg:scale-105">
+      <div className="relative flex items-center justify-center scale-90 sm:scale-95 lg:scale-105">
         {/* Resplandor */}
         <div
           className={cn(
-            "absolute inset-0 blur-[120px] opacity-20 transition-colors duration-1000",
-            isBreak ? "bg-green-500" : "bg-purple-600"
+            "absolute inset-0 blur-[100px] sm:blur-[120px] opacity-20 transition-colors duration-1000",
+            isBreak ? "bg-teal-400" : "bg-purple-400"
           )}
         />
 
@@ -368,9 +368,9 @@ export function Pomodoro() {
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor={isBreak ? "#22c55e" : "#a855f7"} />
-              <stop offset="50%" stopColor={isBreak ? "#16a34a" : "#9333ea"} />
-              <stop offset="100%" stopColor={isBreak ? "#15803d" : "#7c3aed"} />
+              <stop offset="0%" stopColor={isBreak ? "#4ade80" : "#c084fc"} />
+              <stop offset="50%" stopColor={isBreak ? "#22c55e" : "#b794f6"} />
+              <stop offset="100%" stopColor={isBreak ? "#16a34a" : "#a78bfa"} />
             </linearGradient>
             <filter id="glow">
               <feGaussianBlur stdDeviation="4" result="coloredBlur" />
@@ -428,7 +428,7 @@ export function Pomodoro() {
           )}
         </svg>
 
-        <Card className="z-10 w-[300px] h-[300px] rounded-full border border-white/10 bg-card/10 backdrop-blur-3xl shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group">
+        <Card className="z-10 w-64 sm:w-72 lg:w-80 h-64 sm:h-72 lg:h-80 rounded-full border border-white/10 bg-card/10 backdrop-blur-3xl shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group">
           {/* Efectos de fondo animados */}
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
           <div
@@ -444,9 +444,9 @@ export function Pomodoro() {
           {/* Etiqueta de estado flotante interna con animación */}
           <div
             className={cn(
-              "mb-2 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border backdrop-blur-sm transition-all duration-500",
+              "mb-2 px-2 sm:px-3 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-widest border backdrop-blur-sm transition-all duration-500",
               isBreak
-                ? "text-green-500 border-green-500/20 bg-green-500/5"
+                ? "text-teal-500 border-teal-500/20 bg-teal-500/5"
                 : "text-purple-500 border-purple-500/20 bg-purple-500/5"
             )}
             style={{
@@ -459,7 +459,7 @@ export function Pomodoro() {
           {/* Temporizador con animación de escala */}
           <span
             className={cn(
-              "text-7xl font-thin tabular-nums tracking-tighter text-foreground leading-none transition-all duration-300",
+              "text-5xl sm:text-6xl lg:text-7xl font-thin tabular-nums tracking-tighter text-foreground leading-none transition-all duration-300",
               isActive && "scale-110"
             )}
             style={{
@@ -470,7 +470,7 @@ export function Pomodoro() {
           </span>
 
           {/* Porcentaje con animación */}
-          <div className="mt-2 text-[10px] font-bold opacity-30 uppercase tracking-[0.2em] transition-all duration-500">
+          <div className="mt-2 text-[9px] sm:text-[10px] font-bold opacity-30 uppercase tracking-[0.2em] transition-all duration-500">
             {Math.ceil(animatedProgress)}%
           </div>
 
@@ -495,30 +495,30 @@ export function Pomodoro() {
         onTaskSelect={setSelectedTaskId}
       />
 
-      <div className="mt-8 flex items-center gap-8">
+      <div className="mt-6 sm:mt-8 flex items-center justify-center gap-4 sm:gap-8">
         <Button
           variant="outline"
           size="icon"
           onClick={resetTimer}
-          className="h-12 w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:rotate-[-45deg]"
+          className="h-10 sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:rotate-[-45deg]"
         >
-          <RotateCcw className="h-5 w-5 text-muted-foreground/60" />
+          <RotateCcw className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground/60" />
         </Button>
 
         <Button
           size="lg"
           onClick={toggleTimer}
           className={cn(
-            "h-20 w-20 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 border-[6px] border-background/50",
+            "h-16 sm:h-20 w-16 sm:w-20 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 border-[5px] sm:border-[6px] border-background/50",
             isBreak
-              ? "bg-green-600 shadow-green-500/20"
-              : "bg-purple-600 shadow-purple-500/20"
+              ? "bg-teal-500 shadow-teal-400/30"
+              : "bg-purple-500 shadow-purple-400/30"
           )}
         >
           {isActive ? (
-            <Pause className="h-8 w-8 fill-current text-white" />
+            <Pause className="h-6 sm:h-8 w-6 sm:w-8 fill-current text-white" />
           ) : (
-            <Play className="h-8 w-8 fill-current text-white ml-1" />
+            <Play className="h-6 sm:h-8 w-6 sm:w-8 fill-current text-white ml-0.5 sm:ml-1" />
           )}
         </Button>
 
@@ -526,9 +526,9 @@ export function Pomodoro() {
           variant="outline"
           size="icon"
           onClick={skipSession}
-          className="h-12 w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:translate-x-1"
+          className="h-10 sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:translate-x-1"
         >
-          <ChevronRight className="h-5 w-5 text-muted-foreground/60" />
+          <ChevronRight className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground/60" />
         </Button>
       </div>
     </div>

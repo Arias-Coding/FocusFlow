@@ -61,7 +61,7 @@ export function CalendarDemo() {
                   "backdrop-blur-xl border border-white/20 dark:border-white/5",
                   isPastMonth
                     ? "bg-muted/10 opacity-40 grayscale-[0.8]"
-                    : "bg-card/40 shadow-[10px_10px_20px_rgba(0,0,0,0.05),-10px_-10px_20px_rgba(255,255,255,0.8)] dark:shadow-[10px_10px_20px_rgba(0,0,0,0.2),-5px_-5px_15px_rgba(255,255,255,0.02)]",
+                    : "bg-card/40 shadow-[0_8px_16px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_16px_rgba(0,0,0,0.3)]",
                   isCurrentMonth && "bg-card/80 scale-105 border-primary/20"
                 )}
                 classNames={{
