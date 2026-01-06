@@ -17,6 +17,8 @@ import {
   TreePine,
   Waves,
   Download,
+  Coffee,
+  Zap,
 } from "lucide-react";
 
 import { useAuth } from "@/components/context/AuthContext";
@@ -80,7 +82,7 @@ export default function Settings() {
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, accentColor, setAccentColor } = useTheme();
   const { user } = useAuth();
 
   const handleExportData = async () => {
@@ -199,12 +201,12 @@ export default function Settings() {
           </SettingsItem>
         </SettingsGroup>
 
-        {/* GRUPO APARIENCIA - FUNCIONAL */}
+        {/* GRUPO APARIENCIA - TEMA VISUAL */}
         <SettingsGroup title="Apariencia">
           <SettingsItem
             icon={Palette}
             label="Tema Visual"
-            description="Personaliza cómo se ve tu interfaz"
+            description="Estilo general de la interfaz"
           >
             <div className="flex bg-foreground/[0.05] dark:bg-white/10 p-1 rounded-xl border border-foreground/5">
               {/* BOTÓN LIGHT */}
@@ -280,6 +282,194 @@ export default function Settings() {
                 )}
               >
                 <Waves className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN CATPPUCCIN LATTE */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("catppuccin-latte")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "catppuccin-latte"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Coffee className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN CATPPUCCIN MOCHA */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("catppuccin-mocha")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "catppuccin-mocha"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Coffee className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN TOKYO NIGHT LIGHT */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("tokyo-night-light")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "tokyo-night-light"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Zap className="w-4 h-4" />
+              </Button>
+
+              {/* BOTÓN TOKYO NIGHT DARK */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme("tokyo-night-dark")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  theme === "tokyo-night-dark"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <Zap className="w-4 h-4" />
+              </Button>
+            </div>
+          </SettingsItem>
+
+          <SettingsItem
+            icon={Palette}
+            label="Color Principal"
+            description="Personaliza el color de acento de la interfaz"
+          >
+            <div className="flex bg-foreground/[0.05] dark:bg-white/10 p-1 rounded-xl border border-foreground/5">
+              {/* BOTÓN BLUE */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("blue")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "blue"
+                    ? "bg-blue-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-blue-500" />
+              </Button>
+
+              {/* BOTÓN GREEN */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("green")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "green"
+                    ? "bg-green-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-green-500" />
+              </Button>
+
+              {/* BOTÓN PURPLE */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("purple")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "purple"
+                    ? "bg-purple-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-purple-500" />
+              </Button>
+
+              {/* BOTÓN RED */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("red")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "red"
+                    ? "bg-red-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-red-500" />
+              </Button>
+
+              {/* BOTÓN ORANGE */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("orange")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "orange"
+                    ? "bg-orange-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-orange-500" />
+              </Button>
+
+              {/* BOTÓN PINK */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("pink")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "pink"
+                    ? "bg-pink-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-pink-500" />
+              </Button>
+
+              {/* BOTÓN INDIGO */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("indigo")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "indigo"
+                    ? "bg-indigo-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-indigo-500" />
+              </Button>
+
+              {/* BOTÓN TEAL */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAccentColor("teal")}
+                className={cn(
+                  "h-8 w-8 rounded-lg p-0 transition-all",
+                  accentColor === "teal"
+                    ? "bg-teal-500 text-white shadow-sm"
+                    : "text-foreground/40 hover:text-foreground"
+                )}
+              >
+                <div className="w-4 h-4 rounded-full bg-teal-500" />
               </Button>
             </div>
           </SettingsItem>

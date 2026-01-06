@@ -1,21 +1,46 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system" | "forest" | "ocean";
+type Theme =
+  | "dark"
+  | "light"
+  | "system"
+  | "forest"
+  | "ocean"
+  | "catppuccin-latte"
+  | "catppuccin-mocha"
+  | "tokyo-night-light"
+  | "tokyo-night-dark";
+
+type AccentColor =
+  | "blue"
+  | "green"
+  | "purple"
+  | "red"
+  | "orange"
+  | "pink"
+  | "indigo"
+  | "teal";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
+  defaultAccentColor?: AccentColor;
   storageKey?: string;
+  accentStorageKey?: string;
 };
 
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  accentColor: AccentColor;
+  setAccentColor: (color: AccentColor) => void;
 };
 
 const initialState: ThemeProviderState = {
   theme: "system",
   setTheme: () => null,
+  accentColor: "blue",
+  setAccentColor: () => null,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -23,17 +48,33 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = "system",
+  defaultAccentColor = "blue",
   storageKey = "vite-ui-theme",
+  accentStorageKey = "vite-ui-accent",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const [accentColor, setAccentColor] = useState<AccentColor>(
+    () =>
+      (localStorage.getItem(accentStorageKey) as AccentColor) ||
+      defaultAccentColor
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark", "forest", "ocean");
+    root.classList.remove(
+      "light",
+      "dark",
+      "forest",
+      "ocean",
+      "catppuccin-latte",
+      "catppuccin-mocha",
+      "tokyo-night-light",
+      "tokyo-night-dark"
+    );
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
@@ -42,32 +83,39 @@ export function ThemeProvider({
         : "light";
 
       root.classList.add(systemTheme);
-      root.style.setProperty(
-        "--primary",
-        systemTheme === "dark" ? "hsl(210 40% 60%)" : "hsl(210 40% 40%)"
-      );
       return;
     }
 
     root.classList.add(theme);
-
-    // Set primary color based on theme
-    if (theme === "forest") {
-      root.style.setProperty("--primary", "hsl(142 76% 36%)"); // Green
-    } else if (theme === "ocean") {
-      root.style.setProperty("--primary", "hsl(199 89% 48%)"); // Blue
-    } else if (theme === "light") {
-      root.style.setProperty("--primary", "hsl(210 40% 40%)");
-    } else if (theme === "dark") {
-      root.style.setProperty("--primary", "hsl(210 40% 60%)");
-    }
   }, [theme]);
+
+  // Apply accent color
+  useEffect(() => {
+    const root = window.document.documentElement;
+    const accentColors = {
+      blue: "hsl(217.2 91.2% 59.8%)",
+      green: "hsl(142.1 76.2% 36.3%)",
+      purple: "hsl(262.1 83.3% 57.8%)",
+      red: "hsl(0 84.2% 60.2%)",
+      orange: "hsl(24.6 95% 53.1%)",
+      pink: "hsl(316.7 100% 68.8%)",
+      indigo: "hsl(231.4 48.1% 48.3%)",
+      teal: "hsl(173.4 80.4% 40%)",
+    };
+
+    root.style.setProperty("--primary", accentColors[accentColor]);
+  }, [accentColor]);
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
+    },
+    accentColor,
+    setAccentColor: (color: AccentColor) => {
+      localStorage.setItem(accentStorageKey, color);
+      setAccentColor(color);
     },
   };
 

@@ -2,9 +2,21 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { StickyNote, Plus, Trash2, ChevronLeft } from "lucide-react";
+import {
+  StickyNote,
+  Plus,
+  Trash2,
+  ChevronLeft,
+  Info,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Lightbulb,
+} from "lucide-react";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkHighlight from "remark-highlight";
 import { cn, saveToLocalStorage, loadFromLocalStorage } from "@/lib/utils";
 
 import { useAuth } from "@/components/context/AuthContext"; // Importamos el usuario
@@ -15,6 +27,123 @@ interface Note {
   title: string;
   content: string;
   date: string;
+}
+
+// --- Componente: Callout personalizado ---
+function Callout({
+  type,
+  title,
+  children,
+}: {
+  type: string;
+  title?: string;
+  children: React.ReactNode;
+}) {
+  const getCalloutConfig = (type: string) => {
+    switch (type.toUpperCase()) {
+      case "INFO":
+        return {
+          icon: Info,
+          bgColor: "bg-blue-50 dark:bg-blue-950/20",
+          borderColor: "border-blue-200 dark:border-blue-800",
+          iconColor: "text-blue-600 dark:text-blue-400",
+          titleColor: "text-blue-900 dark:text-blue-100",
+        };
+      case "WARNING":
+      case "WARN":
+        return {
+          icon: AlertTriangle,
+          bgColor: "bg-yellow-50 dark:bg-yellow-950/20",
+          borderColor: "border-yellow-200 dark:border-yellow-800",
+          iconColor: "text-yellow-600 dark:text-yellow-400",
+          titleColor: "text-yellow-900 dark:text-yellow-100",
+        };
+      case "SUCCESS":
+      case "CHECK":
+        return {
+          icon: CheckCircle,
+          bgColor: "bg-green-50 dark:bg-green-950/20",
+          borderColor: "border-green-200 dark:border-green-800",
+          iconColor: "text-green-600 dark:text-green-400",
+          titleColor: "text-green-900 dark:text-green-100",
+        };
+      case "ERROR":
+      case "DANGER":
+        return {
+          icon: XCircle,
+          bgColor: "bg-red-50 dark:bg-red-950/20",
+          borderColor: "border-red-200 dark:border-red-800",
+          iconColor: "text-red-600 dark:text-red-400",
+          titleColor: "text-red-900 dark:text-red-100",
+        };
+      case "TIP":
+      case "HINT":
+        return {
+          icon: Lightbulb,
+          bgColor: "bg-purple-50 dark:bg-purple-950/20",
+          borderColor: "border-purple-200 dark:border-purple-800",
+          iconColor: "text-purple-600 dark:text-purple-400",
+          titleColor: "text-purple-900 dark:text-purple-100",
+        };
+      case "NOTE":
+        return {
+          icon: StickyNote,
+          bgColor: "bg-gray-50 dark:bg-gray-950/20",
+          borderColor: "border-gray-200 dark:border-gray-800",
+          iconColor: "text-gray-600 dark:text-gray-400",
+          titleColor: "text-gray-900 dark:text-gray-100",
+        };
+      default:
+        return {
+          icon: Info,
+          bgColor: "bg-primary/5",
+          borderColor: "border-primary/30",
+          iconColor: "text-primary",
+          titleColor: "text-primary",
+        };
+    }
+  };
+
+  const config = getCalloutConfig(type);
+  const Icon = config.icon;
+
+  return (
+    <div
+      className={cn(
+        "my-4 sm:my-6 p-3 sm:p-4 rounded-lg border-l-4 shadow-sm",
+        config.bgColor,
+        config.borderColor
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <Icon
+          className={cn("w-5 h-5 mt-0.5 flex-shrink-0", config.iconColor)}
+        />
+        <div className="flex-1">
+          {title && (
+            <div
+              className={cn(
+                "font-semibold text-sm sm:text-base mb-2",
+                config.titleColor
+              )}
+            >
+              {title}
+            </div>
+          )}
+          <div className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Función para copiar código ---
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).catch((err) => {
+    console.error("Error al copiar:", err);
+  });
 }
 
 // --- Componente: Editor Refinado ---
@@ -37,6 +166,28 @@ function MarkdownEditor({
 
 // --- Componente: Preview Obsidian-Style ---
 function MarkdownPreview({ content }: { content: string }) {
+  // Procesar callouts antes de renderizar
+  const processCallouts = (text: string): string => {
+    const calloutRegex = /^>\s*\[!(.*?)\](?:\s+(.*?))?\n((?:>.*\n?)*)/gm;
+
+    return text.replace(
+      calloutRegex,
+      (_match: string, type: string, title: string, content: string) => {
+        const processedContent = content
+          .split("\n")
+          .filter((line: string) => line.startsWith(">"))
+          .map((line: string) => line.substring(1).trim())
+          .join("\n");
+
+        return `<div data-callout="${type}" data-title="${
+          title || ""
+        }" data-content="${processedContent.replace(/"/g, "&quot;")}"></div>`;
+      }
+    );
+  };
+
+  const processedContent = processCallouts(content);
+
   return (
     <div
       className="prose prose-stone dark:prose-invert max-w-none 
@@ -72,7 +223,7 @@ function MarkdownPreview({ content }: { content: string }) {
       md:prose-h1:text-4xl md:prose-h1:text-5xl md:prose-h2:text-3xl md:prose-h3:text-2xl"
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkHighlight]}
         components={{
           h1: ({ children }) => (
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4 sm:mb-6 pb-2 border-b border-border/50 mt-6 sm:mt-8 first:mt-0">
@@ -94,14 +245,92 @@ function MarkdownPreview({ content }: { content: string }) {
               {children}
             </blockquote>
           ),
-          code: ({ children }) => {
-            return <code>{children}</code>;
+          code: ({ children, className }) => {
+            // Check if it's inline code (no className or specific className)
+            const isInline = !className || !className.includes("language-");
+            if (isInline) {
+              return (
+                <code className="text-primary bg-primary/10 px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono">
+                  {children}
+                </code>
+              );
+            }
+            return <code className={className}>{children}</code>;
           },
-          pre: ({ children }) => (
-            <pre className="bg-zinc-950 border border-white/5 shadow-2xl rounded-lg p-3 sm:p-4 overflow-x-auto my-4 sm:my-6 text-xs sm:text-sm">
+          pre: ({ children }) => {
+            // Extract text content from code element
+            const codeElement = React.Children.toArray(children).find(
+              (child) => React.isValidElement(child) && child.type === "code"
+            ) as React.ReactElement<{ children?: React.ReactNode }> | undefined;
+
+            const codeContent = codeElement?.props?.children
+              ? String(codeElement.props.children)
+              : String(children);
+
+            return (
+              <pre className="bg-zinc-950 dark:bg-zinc-900 border border-white/5 dark:border-white/10 shadow-2xl rounded-lg p-3 sm:p-4 overflow-x-auto my-4 sm:my-6 text-xs sm:text-sm font-mono relative group">
+                <button
+                  onClick={() => copyToClipboard(codeContent)}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-zinc-200 text-xs px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700"
+                >
+                  Copiar
+                </button>
+                <code className="bg-transparent text-zinc-100 dark:text-zinc-200 px-0 py-0 block">
+                  {children}
+                </code>
+              </pre>
+            );
+          },
+          mark: ({ children }) => (
+            <mark className="bg-yellow-200 dark:bg-yellow-600/30 text-yellow-900 dark:text-yellow-100 px-1 py-0.5 rounded-sm font-medium">
               {children}
-            </pre>
+            </mark>
           ),
+          div: ({ children, ...props }) => {
+            // Handle callouts - check if this div has callout data attributes
+            const calloutType = (props as any)["data-callout"];
+            const calloutTitle = (props as any)["data-title"];
+            const calloutContent = (props as any)["data-content"];
+
+            if (calloutType) {
+              return (
+                <Callout type={calloutType} title={calloutTitle || undefined}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm, remarkHighlight]}
+                    components={{
+                      p: ({ children }) => <>{children}</>,
+                      strong: ({ children }) => (
+                        <strong className="font-semibold">{children}</strong>
+                      ),
+                      em: ({ children }) => (
+                        <em className="italic">{children}</em>
+                      ),
+                      code: ({ children, className }) => {
+                        const isInline =
+                          !className || !className.includes("language-");
+                        if (isInline) {
+                          return (
+                            <code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-xs font-mono">
+                              {children}
+                            </code>
+                          );
+                        }
+                        return <code className={className}>{children}</code>;
+                      },
+                      mark: ({ children }) => (
+                        <mark className="bg-yellow-200 dark:bg-yellow-600/30 text-yellow-900 dark:text-yellow-100 px-1 py-0.5 rounded-sm font-medium">
+                          {children}
+                        </mark>
+                      ),
+                    }}
+                  >
+                    {calloutContent}
+                  </ReactMarkdown>
+                </Callout>
+              );
+            }
+            return <div {...props}>{children}</div>;
+          },
           ul: ({ children }) => (
             <ul className="my-4 sm:my-6 space-y-1 sm:space-y-2 ml-4 sm:ml-6">
               {children}
@@ -156,7 +385,7 @@ function MarkdownPreview({ content }: { content: string }) {
           ),
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
@@ -525,7 +754,7 @@ export function Notes() {
                   {viewMode === "edit" ? (
                     <MarkdownEditor
                       content={activeNote.content}
-                      onChange={(val) =>
+                      onChange={(val: string) =>
                         updateNote(activeNote.id, "content", val)
                       }
                     />
