@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light" | "system" | "forest" | "ocean";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -33,7 +33,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
+    root.classList.remove("light", "dark", "forest", "ocean");
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
@@ -42,10 +42,25 @@ export function ThemeProvider({
         : "light";
 
       root.classList.add(systemTheme);
+      root.style.setProperty(
+        "--primary",
+        systemTheme === "dark" ? "hsl(210 40% 60%)" : "hsl(210 40% 40%)"
+      );
       return;
     }
 
     root.classList.add(theme);
+
+    // Set primary color based on theme
+    if (theme === "forest") {
+      root.style.setProperty("--primary", "hsl(142 76% 36%)"); // Green
+    } else if (theme === "ocean") {
+      root.style.setProperty("--primary", "hsl(199 89% 48%)"); // Blue
+    } else if (theme === "light") {
+      root.style.setProperty("--primary", "hsl(210 40% 40%)");
+    } else if (theme === "dark") {
+      root.style.setProperty("--primary", "hsl(210 40% 60%)");
+    }
   }, [theme]);
 
   const value = {

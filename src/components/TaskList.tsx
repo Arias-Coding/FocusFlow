@@ -4,7 +4,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Plus, ListChecks } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  cn,
+  addXP,
+  triggerConfetti,
+  saveToLocalStorage,
+  loadFromLocalStorage,
+} from "@/lib/utils";
 import useSound from "use-sound";
 import checkSound from "@/assets/sounds/pop-sound.mp3";
 import deleteSound from "@/assets/sounds/del-pop.mp3";
@@ -12,6 +18,7 @@ import bellSound from "@/assets/sounds/notification-bell-sound.mp3";
 
 import { useAuth } from "@/components/context/AuthContext";
 import { taskService } from "@/lib/appwrite";
+import { PageLayout, PageHeader } from "@/components/ui/layout";
 
 interface Task {
   id: string; // Cambiado a string para Appwrite
@@ -31,7 +38,14 @@ export function TaskList() {
   // 1. Cargar tareas iniciales
   useEffect(() => {
     const fetchTasks = async () => {
-      if (!user) return;
+      if (!user) {
+        // Load from localStorage if no user
+        const localTasks = loadFromLocalStorage("tasks") || [];
+        setTasks(localTasks);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await taskService.getTasks(user.$id);
         const formatted = data.documents.map((doc: any) => ({
@@ -40,8 +54,13 @@ export function TaskList() {
           completed: doc.completed,
         }));
         setTasks(formatted);
+        // Save to localStorage as backup
+        saveToLocalStorage("tasks", formatted);
       } catch (error) {
         console.error("Error al cargar tareas:", error);
+        // Fallback to localStorage
+        const localTasks = loadFromLocalStorage("tasks") || [];
+        setTasks(localTasks);
       } finally {
         setIsLoading(false);
       }
@@ -60,11 +79,25 @@ export function TaskList() {
         text: newTask,
         completed: false,
       };
-      setTasks([task, ...tasks]);
+      const updatedTasks = [task, ...tasks];
+      setTasks(updatedTasks);
       playAdd();
       setNewTask("");
+      // Save to localStorage
+      saveToLocalStorage("tasks", updatedTasks);
     } catch (error) {
       console.error("Error al guardar tarea:", error);
+      // Still add to local state and localStorage for offline functionality
+      const localTask: Task = {
+        id: `local-${Date.now()}`,
+        text: newTask,
+        completed: false,
+      };
+      const updatedTasks = [localTask, ...tasks];
+      setTasks(updatedTasks);
+      saveToLocalStorage("tasks", updatedTasks);
+      playAdd();
+      setNewTask("");
     }
   };
 
@@ -76,11 +109,20 @@ export function TaskList() {
     const nextState = !task.completed;
 
     // UI optimista: actualizamos primero para que sea instantáneo
-    setTasks(
-      tasks.map((t) => (t.id === id ? { ...t, completed: nextState } : t))
+    const updatedTasks = tasks.map((t) =>
+      t.id === id ? { ...t, completed: nextState } : t
     );
+    setTasks(updatedTasks);
 
     nextState ? playComplete() : playDelete();
+
+    if (nextState) {
+      addXP(10); // 10 XP por completar tarea
+      triggerConfetti("task"); // Trigger confetti animation
+    }
+
+    // Save to localStorage immediately
+    saveToLocalStorage("tasks", updatedTasks);
 
     try {
       await taskService.toggleTask(id, nextState);
@@ -94,12 +136,20 @@ export function TaskList() {
 
   // 4. Eliminar de la nube
   const deleteTask = async (id: string) => {
+    const updatedTasks = tasks.filter((t) => t.id !== id);
+    setTasks(updatedTasks);
+    playDelete();
+
+    // Save to localStorage immediately
+    saveToLocalStorage("tasks", updatedTasks);
+
     try {
       await taskService.deleteTask(id);
-      setTasks(tasks.filter((t) => t.id !== id));
-      playDelete();
     } catch (error) {
       console.error("Error al borrar tarea:", error);
+      // Revert the change
+      setTasks(tasks);
+      saveToLocalStorage("tasks", tasks);
     }
   };
 
@@ -109,22 +159,14 @@ export function TaskList() {
     );
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 lg:p-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+    <PageLayout>
+      <PageHeader title="Tareas" subtitle="Gestiona tus objetivos diarios" />
+
       <Card className="border-none bg-card/40 backdrop-blur-xl shadow-3xl rounded-[32px] lg:rounded-[45px] overflow-hidden">
         <CardContent className="p-0">
           <div className="flex flex-col lg:flex-row">
-            {/* Panel Izquierdo: Control y Estadísticas */}
+            {/* Panel Izquierdo: Estadísticas */}
             <div className="w-full lg:w-[300px] bg-muted/30 p-8 border-b lg:border-b-0 lg:border-r border-border/50 space-y-8">
-              <div className="space-y-2">
-                <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-                  <ListChecks className="text-primary w-6 h-6" />
-                </div>
-                <h2 className="text-3xl font-black tracking-tighter">Tareas</h2>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground opacity-70">
-                  Gestión de objetivos
-                </p>
-              </div>
-
               <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
                 <div className="bg-background/50 p-4 rounded-2xl border border-border/50">
                   <span className="text-2xl font-black text-primary">
@@ -223,7 +265,7 @@ export function TaskList() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageLayout>
   );
 }
 

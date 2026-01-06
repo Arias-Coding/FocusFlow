@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/context/theme-provider";
-import { FloatingNav } from "./components/FloatingNav";
+import { SidebarNav } from "./components/FloatingNav";
 import { Pomodoro } from "./components/Pomodoro";
 import TaskList from "./components/TaskList";
 import { Notes } from "./components/Notes.tsx";
@@ -10,42 +10,35 @@ import Settings from "./components/Settings.tsx";
 
 import { AuthProvider, useAuth } from "./components/context/AuthContext";
 import { Login } from "./components/Login";
-
-// - Agregar mini animacion de confeti en el cursor al completar una tarea
-// - Agregar seccion de musica zen (brown noise, rain, fire)
-// - Títulos de Pestaña Dinámicos (document.title) ((24:10) Enfoque...)
-// - Color de la app dependiendo el estado (default, work, break)
-// - Asignar Tarea al Pomodoro
-// - Cambiar el tema (más allá de Dark/Light, quizás un tema "Bosque" o "Mar").
-//
-// - Creacion de cuenta e inicio de secion
-// - Objetivos del año => Sonido epico de check
-
-// - Dashboard de Bienvenida: Una pantalla principal que muestre:
-//     Una frase motivadora aleatoria.
-//     Un contador de "Tareas para hoy".
-//     Tu hábito con la racha más alta.
-// - Sistema de niveles: Ganar "XP" cada vez que completas una tarea o hábito para gamificar tu productividad.
+import { Zen } from "./components/Zen";
+import { Dashboard } from "./components/Dashboard";
+import { Goals } from "./components/Goals";
 
 type Section =
+  | "Dashboard"
   | "Pomodoro"
   | "Calendar"
   | "Tasks"
   | "Habits"
   | "Notes"
-  | "Settings";
+  | "Settings"
+  | "Zen"
+  | "Goals";
 
 const sections = {
+  Dashboard: <Dashboard />,
   Pomodoro: <Pomodoro />,
   Calendar: <CalendarDemo />,
   Tasks: <TaskList />, // Asegúrate de haber importado TaskList
   Habits: <HabitsList />,
   Notes: <Notes />,
   Settings: <Settings />,
+  Zen: <Zen />,
+  Goals: <Goals />,
 };
 
 function AppContent() {
-  const [currentSection, setCurrentSection] = useState<Section>("Pomodoro");
+  const [currentSection, setCurrentSection] = useState<Section>("Dashboard");
 
   useEffect(() => {
     document.title = currentSection;
@@ -67,23 +60,19 @@ function AppContent() {
 
   // Si hay usuario, mostramos la App normal
   return (
-    <div className=" bg-background text-foreground relative">
-      <main className="min-h-lvh flex items-center justify-center p-4">
-        <div className=" bg-background text-foreground relative">
-          <main className="min-h-lvh flex items-center justify-center p-4">
-            {sections[currentSection]}
-          </main>
-
-          <FloatingNav
-            currentSection={currentSection}
-            setCurrentSection={setCurrentSection}
-          />
-        </div>
-      </main>
-      <FloatingNav
+    <div className="min-h-screen bg-background text-foreground flex">
+      {/* Sidebar Navigation */}
+      <SidebarNav
         currentSection={currentSection}
         setCurrentSection={setCurrentSection}
       />
+
+      {/* Main Content */}
+      <main className="flex-1 lg:ml-20 transition-all duration-300">
+        <div className="w-full max-w-7xl mx-auto">
+          {sections[currentSection]}
+        </div>
+      </main>
     </div>
   );
 }
@@ -97,7 +86,7 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <AppContent />
       </ThemeProvider>
     </AuthProvider>

@@ -15,6 +15,7 @@ export const COLLECTIONS = {
     NOTES: import.meta.env.VITE_APPWRITE_COLLECTION_NOTES_ID,
     HABITS: import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
     TASKS: import.meta.env.VITE_APPWRITE_COLLECTION_TASKS_ID,
+    GOALS: import.meta.env.VITE_APPWRITE_COLLECTION_GOALS_ID,
 };
 
 // --- SERVICIO DE NOTAS ---
@@ -118,6 +119,35 @@ export const habitService = {
       import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
       documentId,
       { completedDays: days, streak: streak }
+    );
+  }
+};
+
+// --- SERVICIO DE OBJETIVOS ---
+export const goalService = {
+  async createGoal(userId: string, title: string, description: string, year: number) {
+    return await databases.createDocument(
+      DB_ID,
+      COLLECTIONS.GOALS,
+      ID.unique(),
+      { userId, title, description, completed: false, year }
+    );
+  },
+
+  async getGoals(userId: string, year: number) {
+    return await databases.listDocuments(
+      DB_ID,
+      COLLECTIONS.GOALS,
+      [Query.equal("userId", userId), Query.equal("year", year)]
+    );
+  },
+
+  async toggleGoal(documentId: string, completed: boolean) {
+    return await databases.updateDocument(
+      DB_ID,
+      COLLECTIONS.GOALS,
+      documentId,
+      { completed }
     );
   }
 };

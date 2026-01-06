@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { StickyNote, Plus, Trash2, ChevronLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/lib/utils";
+import { cn, saveToLocalStorage, loadFromLocalStorage } from "@/lib/utils";
 
 import { useAuth } from "@/components/context/AuthContext"; // Importamos el usuario
 import { noteService } from "@/lib/appwrite"; // Importamos el servicio
@@ -30,7 +30,7 @@ function MarkdownEditor({
       value={content}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Escribe tus pensamientos aquí..."
-      className="w-full bg-transparent border-none resize-none focus-visible:ring-0 p-0 text-lg leading-relaxed min-h-[500px] font-sans text-foreground/80 placeholder:text-muted-foreground/30 selection:bg-primary/30"
+      className="w-full bg-transparent border-none resize-none focus-visible:ring-0 p-0 text-base sm:text-lg leading-relaxed min-h-[400px] sm:min-h-[500px] font-sans text-foreground/80 placeholder:text-muted-foreground/30 selection:bg-primary/30"
     />
   );
 }
@@ -41,18 +41,129 @@ function MarkdownPreview({ content }: { content: string }) {
     <div
       className="prose prose-stone dark:prose-invert max-w-none 
       prose-headings:text-foreground prose-headings:tracking-tight prose-headings:font-bold
-      prose-h1:text-4xl prose-h1:mb-6 prose-h1:pb-2 prose-h1:border-b prose-h1:border-border/50
-      prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-      prose-p:text-muted-foreground prose-p:leading-8
-      prose-strong:text-foreground
-      prose-ul:my-6 prose-li:my-2
-      prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-      prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-white/5 prose-pre:shadow-2xl
-      prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-xl prose-blockquote:py-1
-      [&_input[type='checkbox']]:mr-2 [&_input[type='checkbox']]:accent-primary"
+      prose-h1:text-2xl prose-h1:mb-4 prose-h1:pb-2 prose-h1:border-b prose-h1:border-border/50 prose-h1:mt-6
+      prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3 prose-h2:text-primary prose-h2:border-b prose-h2:border-primary/20 prose-h2:pb-1
+      prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2 prose-h3:text-primary/80
+      prose-h4:text-base prose-h4:mt-4 prose-h4:mb-2
+      prose-h5:text-sm prose-h5:mt-4 prose-h5:mb-2 prose-h5:font-semibold
+      prose-h6:text-sm prose-h6:mt-4 prose-h6:mb-2 prose-h6:font-semibold prose-h6:text-muted-foreground
+      prose-p:text-muted-foreground prose-p:leading-7 prose-p:mb-3 prose-p:text-sm sm:prose-p:text-base sm:prose-p:leading-8 sm:prose-p:mb-4
+      prose-strong:text-foreground prose-strong:font-bold
+      prose-em:text-foreground/90 prose-em:italic
+      prose-ul:my-4 prose-ul:space-y-1 prose-li:my-1 prose-li:marker:text-primary
+      prose-ol:my-4 prose-ol:space-y-1
+      prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:rounded-r-md prose-blockquote:text-sm
+      prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono
+      prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-white/5 prose-pre:shadow-2xl prose-pre:rounded-lg prose-pre:p-3 prose-pre:overflow-x-auto prose-pre:text-xs
+      prose-pre code:bg-transparent prose-pre code:text-zinc-100 prose-pre code:px-0 prose-pre code:py-0
+      prose-hr:border-border/50 prose-hr:my-6
+      prose-table:border-collapse prose-table:border prose-table:border-border/50 prose-table:my-4 prose-table:text-xs
+      prose-th:bg-muted/50 prose-th:border prose-th:border-border/50 prose-th:px-2 prose-th:py-1 prose-th:text-left prose-th:font-semibold prose-th:text-xs
+      prose-td:border prose-td:border-border/50 prose-td:px-2 prose-td:py-1 prose-td:text-xs
+      prose-a:text-primary prose-a:underline prose-a:underline-offset-2 prose-a:decoration-primary/50 hover:prose-a:decoration-primary
+      prose-img:rounded-lg prose-img:shadow-md prose-img:border prose-img:border-border/50 prose-img:max-w-full
+      sm:prose-h1:text-3xl sm:prose-h1:mb-6 sm:prose-h1:mt-8
+      sm:prose-h2:text-2xl sm:prose-h2:mt-10 sm:prose-h2:mb-4
+      sm:prose-h3:text-xl sm:prose-h3:mt-8 sm:prose-h3:mb-3
+      sm:prose-blockquote:pl-6 sm:prose-blockquote:text-base
+      sm:prose-code:px-1.5 sm:prose-code:py-0.5 sm:prose-code:text-sm
+      sm:prose-pre:p-4 sm:prose-pre:text-sm
+      sm:prose-table:text-sm sm:prose-th:px-4 sm:prose-th:py-2 sm:prose-th:text-sm sm:prose-td:px-4 sm:prose-td:py-2 sm:prose-td:text-sm
+      md:prose-h1:text-4xl md:prose-h1:text-5xl md:prose-h2:text-3xl md:prose-h3:text-2xl"
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-        {content || "*No hay contenido para mostrar*"}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ children }) => (
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4 sm:mb-6 pb-2 border-b border-border/50 mt-6 sm:mt-8 first:mt-0">
+              {children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-primary mb-3 sm:mb-4 pb-1 border-b border-primary/20 mt-8 sm:mt-10">
+              {children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-primary/80 mb-2 sm:mb-3 mt-6 sm:mt-8">
+              {children}
+            </h3>
+          ),
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-primary/30 pl-4 sm:pl-6 italic bg-primary/5 py-2 rounded-r-md my-4 sm:my-6 text-sm sm:text-base">
+              {children}
+            </blockquote>
+          ),
+          code: ({ inline, children }) => {
+            if (inline) {
+              return (
+                <code className="text-primary bg-primary/10 px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono">
+                  {children}
+                </code>
+              );
+            }
+            return <code>{children}</code>;
+          },
+          pre: ({ children }) => (
+            <pre className="bg-zinc-950 border border-white/5 shadow-2xl rounded-lg p-3 sm:p-4 overflow-x-auto my-4 sm:my-6 text-xs sm:text-sm">
+              {children}
+            </pre>
+          ),
+          ul: ({ children }) => (
+            <ul className="my-4 sm:my-6 space-y-1 sm:space-y-2 ml-4 sm:ml-6">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="my-4 sm:my-6 space-y-1 sm:space-y-2 ml-4 sm:ml-6">
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => (
+            <li className="text-muted-foreground leading-6 sm:leading-7 marker:text-primary text-sm sm:text-base my-1">
+              {children}
+            </li>
+          ),
+          p: ({ children }) => (
+            <p className="text-muted-foreground leading-6 sm:leading-8 mb-3 sm:mb-4 last:mb-0 text-sm sm:text-base">
+              {children}
+            </p>
+          ),
+          strong: ({ children }) => (
+            <strong className="text-foreground font-bold">{children}</strong>
+          ),
+          em: ({ children }) => (
+            <em className="text-foreground/90 italic">{children}</em>
+          ),
+          hr: () => <hr className="border-border/50 my-6 sm:my-8" />,
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-4 sm:my-6">
+              <table className="border-collapse border border-border/50 min-w-full text-xs sm:text-sm">
+                {children}
+              </table>
+            </div>
+          ),
+          th: ({ children }) => (
+            <th className="bg-muted/50 border border-border/50 px-4 py-2 text-left font-semibold">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-border/50 px-4 py-2">{children}</td>
+          ),
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              className="text-primary underline underline-offset-2 decoration-primary/50 hover:decoration-primary transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {content}
       </ReactMarkdown>
     </div>
   );
@@ -77,7 +188,15 @@ export function Notes() {
   // 1. Cargar notas
   useEffect(() => {
     const fetchNotes = async () => {
-      if (!user) return;
+      if (!user) {
+        // Load from localStorage if no user
+        const localNotes = loadFromLocalStorage("notes") || [];
+        setNotes(localNotes);
+        if (localNotes.length > 0) setSelectedId(localNotes[0].id);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await noteService.getNotes(user.$id);
         const formattedNotes = data.documents.map((doc: any) => ({
@@ -88,8 +207,14 @@ export function Notes() {
         }));
         setNotes(formattedNotes);
         if (formattedNotes.length > 0) setSelectedId(formattedNotes[0].id);
+        // Save to localStorage as backup
+        saveToLocalStorage("notes", formattedNotes);
       } catch (error) {
         console.error("Error cargando notas:", error);
+        // Fallback to localStorage
+        const localNotes = loadFromLocalStorage("notes") || [];
+        setNotes(localNotes);
+        if (localNotes.length > 0) setSelectedId(localNotes[0].id);
       } finally {
         setIsLoading(false);
       }
@@ -117,16 +242,17 @@ export function Notes() {
         }
       };
       syncWithAppwrite();
+
+      // Always save to localStorage for offline persistence
+      const updatedNotes = notes.map((note) =>
+        note.id === debouncedNote.id ? debouncedNote : note
+      );
+      saveToLocalStorage("notes", updatedNotes);
     }
   }, [debouncedNote?.title, debouncedNote?.content]);
 
   // 3. Crear nota CORREGIDO
   const addNote = async () => {
-    if (!user) {
-      console.error("No hay usuario autenticado");
-      return;
-    }
-
     const newNoteData = {
       title: "Nueva nota",
       content: "",
@@ -136,42 +262,65 @@ export function Notes() {
     };
 
     try {
-      // 1. Llamada a Appwrite
-      const res = await noteService.createNote(
-        user.$id,
-        newNoteData.title,
-        newNoteData.content,
-        newNoteData.date
-      );
+      if (user) {
+        // 1. Llamada a Appwrite
+        const res = await noteService.createNote(
+          user.$id,
+          newNoteData.title,
+          newNoteData.content,
+          newNoteData.date
+        );
 
-      if (res?.$id) {
-        const createdNote = { id: res.$id, ...newNoteData };
+        if (res?.$id) {
+          const createdNote = { id: res.$id, ...newNoteData };
 
-        // 2. Actualizamos el estado asegurando que la nueva nota sea la primera
-        setNotes((prevNotes) => [createdNote, ...prevNotes]);
+          // 2. Actualizamos el estado asegurando que la nueva nota sea la primera
+          const updatedNotes = [createdNote, ...notes];
+          setNotes(updatedNotes);
 
-        // 3. La seleccionamos y entramos en modo edición
-        setSelectedId(createdNote.id);
+          // 3. La seleccionamos y entramos en modo edición
+          setSelectedId(createdNote.id);
+          setViewMode("edit");
+
+          // Save to localStorage
+          saveToLocalStorage("notes", updatedNotes);
+        }
+      } else {
+        // Offline mode - create local note
+        const localNote = { id: `local-${Date.now()}`, ...newNoteData };
+        const updatedNotes = [localNote, ...notes];
+        setNotes(updatedNotes);
+        setSelectedId(localNote.id);
         setViewMode("edit");
+        saveToLocalStorage("notes", updatedNotes);
       }
     } catch (error) {
       console.error("Error crítico al crear nota:", error);
-      alert(
-        "No se pudo crear la nota. Revisa la consola o los permisos de Appwrite."
-      );
+      // Fallback to local storage
+      const localNote = { id: `local-${Date.now()}`, ...newNoteData };
+      const updatedNotes = [localNote, ...notes];
+      setNotes(updatedNotes);
+      setSelectedId(localNote.id);
+      setViewMode("edit");
+      saveToLocalStorage("notes", updatedNotes);
     }
   };
 
   // 4. Borrar nota
   const deleteNote = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    const updatedNotes = notes.filter((n) => n.id !== id);
+    setNotes(updatedNotes);
+    if (selectedId === id) setSelectedId(updatedNotes[0]?.id || null);
+
+    // Save to localStorage immediately
+    saveToLocalStorage("notes", updatedNotes);
+
     try {
-      await noteService.deleteNote(id);
-      setNotes((prev) => {
-        const filtered = prev.filter((n) => n.id !== id);
-        if (selectedId === id) setSelectedId(filtered[0]?.id || null);
-        return filtered;
-      });
+      if (user) {
+        await noteService.deleteNote(id);
+      }
     } catch (error) {
       console.error("Error al borrar:", error);
     }
@@ -286,42 +435,44 @@ export function Notes() {
         {activeNote ? (
           <>
             {/* Toolbar Superior */}
-            <header className="flex items-center justify-between px-6 lg:px-10 py-5 border-b border-border/10 bg-background/20">
+            <header className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-4 sm:py-5 border-b border-border/10 bg-background/20">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setSelectedId(null)}
-                className="lg:hidden rounded-full border-border/50"
+                className="lg:hidden rounded-full border-border/50 h-9 w-9 p-0"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <div className="flex bg-muted/40 p-1 rounded-2xl border border-border/20 shadow-inner">
+              <div className="flex bg-muted/40 p-1 rounded-2xl border border-border/20 shadow-inner mx-auto lg:mx-0">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("preview")}
                   className={cn(
-                    "rounded-xl h-9 px-6 font-bold text-xs transition-all",
+                    "rounded-xl h-8 sm:h-9 px-3 sm:px-6 font-bold text-xs transition-all",
                     viewMode === "preview"
                       ? "bg-card text-primary shadow-md"
                       : "text-muted-foreground"
                   )}
                 >
-                  Lectura
+                  <span className="hidden sm:inline">Lectura</span>
+                  <span className="sm:hidden">Ver</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setViewMode("edit")}
                   className={cn(
-                    "rounded-xl h-9 px-6 font-bold text-xs transition-all",
+                    "rounded-xl h-8 sm:h-9 px-3 sm:px-6 font-bold text-xs transition-all",
                     viewMode === "edit"
                       ? "bg-card text-primary shadow-md"
                       : "text-muted-foreground"
                   )}
                 >
-                  Escritura
+                  <span className="hidden sm:inline">Escritura</span>
+                  <span className="sm:hidden">Editar</span>
                 </Button>
               </div>
 
@@ -331,26 +482,31 @@ export function Notes() {
                   Sincronizado
                 </span>
               </div>
+
+              {/* Mobile sync indicator */}
+              <div className="lg:hidden flex items-center gap-1">
+                <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.5)]" />
+              </div>
             </header>
 
             {/* Lienzo de Escritura */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="max-w-4xl mx-auto px-8 lg:px-16 py-12 lg:py-20">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 py-4 sm:py-6 md:py-8 lg:py-12">
                 {/* Cabecera del Documento */}
-                <div className="space-y-6 mb-12">
-                  <div className="flex items-center gap-4 group">
-                    <div className="h-10 w-1 bg-primary/30 group-hover:bg-primary transition-colors rounded-full" />
+                <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-3 sm:gap-4 group">
+                    <div className="h-6 w-1 sm:h-8 sm:w-1.5 bg-primary/30 group-hover:bg-primary transition-colors rounded-full" />
                     <input
                       type="text"
                       value={activeNote.title}
                       onChange={(e) =>
                         updateNote(activeNote.id, "title", e.target.value)
                       }
-                      className="text-3xl lg:text-5xl font-black bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/10"
+                      className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-black bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/10"
                       placeholder="Título del Proyecto"
                     />
                   </div>
-                  <div className="flex items-center gap-6 px-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-3 sm:px-5">
                     <div className="flex flex-col">
                       <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
                         Última edición
@@ -359,7 +515,7 @@ export function Notes() {
                         {activeNote.date}
                       </span>
                     </div>
-                    <div className="w-px h-8 bg-border/40" />
+                    <div className="hidden sm:block w-px h-6 bg-border/40" />
                     <div className="flex flex-col">
                       <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
                         Formato
