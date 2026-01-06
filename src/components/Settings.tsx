@@ -5,10 +5,8 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
-  Bell,
   Palette,
   Volume2,
-  ShieldCheck,
   Moon,
   Sun,
   Laptop,
