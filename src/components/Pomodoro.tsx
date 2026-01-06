@@ -345,7 +345,7 @@ export function Pomodoro() {
         <div
           className={cn(
             "absolute inset-0 blur-[100px] sm:blur-[120px] opacity-20 transition-colors duration-1000",
-            isBreak ? "bg-teal-400" : "bg-purple-400"
+            isBreak ? "bg-teal-400" : "bg-primary"
           )}
         />
 
@@ -410,22 +410,6 @@ export function Pomodoro() {
               transformOrigin: "200px 200px",
             }}
           />
-
-          {/* Indicador de progreso animado */}
-          {animatedProgress > 0 && (
-            <circle
-              cx="200"
-              cy="30" // Top of the circle
-              r="6"
-              fill={isBreak ? "#22c55e" : "#a855f7"}
-              className="animate-pulse"
-              style={{
-                transformOrigin: "200px 200px",
-                transform: `rotate(${(animatedProgress / 100) * 360 - 90}deg)`,
-                transition: "transform 1s ease-out",
-              }}
-            />
-          )}
         </svg>
 
         <Card className="z-10 w-64 sm:w-72 lg:w-80 h-64 sm:h-72 lg:h-80 rounded-full border border-white/10 bg-card/10 backdrop-blur-3xl shadow-2xl flex flex-col items-center justify-center relative overflow-hidden group">
@@ -500,7 +484,7 @@ export function Pomodoro() {
           variant="outline"
           size="icon"
           onClick={resetTimer}
-          className="h-10 sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:rotate-[-45deg]"
+          className="h-10 hover:cursor-pointer sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:rotate-[-45deg]"
         >
           <RotateCcw className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground/60" />
         </Button>
@@ -509,16 +493,16 @@ export function Pomodoro() {
           size="lg"
           onClick={toggleTimer}
           className={cn(
-            "h-16 sm:h-20 w-16 sm:w-20 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 border-[5px] sm:border-[6px] border-background/50",
+            "h-16 sm:h-20 w-16 sm:w-20 rounded-full shadow-2xl transition-all hover:scale-105 hover:cursor-pointer active:scale-95 border-[5px] sm:border-[6px] border-background/50",
             isBreak
               ? "bg-teal-500 shadow-teal-400/30"
-              : "bg-purple-500 shadow-purple-400/30"
+              : "bg-primary shadow-bg-primary-400/30"
           )}
         >
           {isActive ? (
             <Pause className="h-6 sm:h-8 w-6 sm:w-8 fill-current text-white" />
           ) : (
-            <Play className="h-6 sm:h-8 w-6 sm:w-8 fill-current text-white ml-0.5 sm:ml-1" />
+            <Play className="h-6 sm:h-8 w-6 sm:w-8 fill-current text-white" />
           )}
         </Button>
 
@@ -526,7 +510,7 @@ export function Pomodoro() {
           variant="outline"
           size="icon"
           onClick={skipSession}
-          className="h-10 sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:translate-x-1"
+          className="h-10 hover:cursor-pointer sm:h-12 w-10 sm:w-12 rounded-full border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all hover:translate-x-1"
         >
           <ChevronRight className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground/60" />
         </Button>
