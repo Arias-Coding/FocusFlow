@@ -503,6 +503,16 @@ export function Notes() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
 
+  const [height, setHeight] = useState<number | undefined>();
+
+  useEffect(() => {
+    const contenido = document.getElementById(`${selectedId}`);
+    setHeight(contenido?.scrollHeight);
+
+    const card = document.getElementById(`card`);
+    console.log(card);
+  }, [selectedId]);
+
   // 1. Cargar notas
   useEffect(() => {
     const fetchNotes = async () => {
@@ -658,20 +668,23 @@ export function Notes() {
       </div>
     );
 
+  //    h-[${height}px]
+
   return (
-    <div className="w-full max-w-7xl mx-auto h-auto lg:h-[85vh] flex flex-col lg:flex-row gap-0 lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700">
+    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-0 lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700 relative">
       {/* SIDEBAR: Estilo Panel de Control - Bloque Separado */}
+
       <aside
         className={cn(
-          "w-full lg:w-[380px] flex flex-col bg-background lg:bg-transparent border-b lg:border-none sticky top-0 lg:relative z-20 lg:z-auto lg:h-fit",
+          "lg:flex flex-col w-full lg:w-93 bg-card border-none lg:sticky lg:top-20 h-fit",
           selectedId ? "hidden lg:flex" : "flex"
         )}
       >
-        <div className="p-6 lg:p-0 space-y-6 flex flex-col h-full">
+        <div className="p-6 lg:p-0 space-y-6 flex flex-col max-h-[calc(100vh-120px)]">
           {/* Header del Sidebar */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+              <h2 className="text-3xl font-extrabold tracking-tight flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                 Notas
               </h2>
@@ -711,7 +724,7 @@ export function Notes() {
                 <div className="space-y-2">
                   <h3
                     className={cn(
-                      "font-bold truncate text-[16px] transition-colors",
+                      "font-bold truncate text-[20px] transition-colors",
                       selectedId === note.id
                         ? "text-primary"
                         : "text-foreground/80"
@@ -720,11 +733,11 @@ export function Notes() {
                     {note.title || "Documento sin nombre"}
                   </h3>
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground/60 bg-muted px-2 py-0.5 rounded-md">
+                    <span className="text-[13px] font-black uppercase tracking-tighter text-muted-foreground/60 bg-muted px-2 py-0.5 rounded-md">
                       {note.date}
                     </span>
                     <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                    <span className="text-[10px] text-muted-foreground/50 italic">
+                    <span className="text-[15px] text-muted-foreground/50 italic">
                       {note.content?.length || 0} caracteres
                     </span>
                   </div>
@@ -746,9 +759,10 @@ export function Notes() {
       {/* EDITOR: Estilo "Canvas" Ancho - Bloque Separado */}
       <Card
         className={cn(
-          "flex-1 border-none lg:border border-border/40 bg-card/40 backdrop-blur-xl shadow-3xl lg:rounded-[40px] flex flex-col transition-all duration-500 min-h-screen lg:min-h-[85vh]",
+          "flex-1 border-none lg:border border-border/40 bg-card/40 backdrop-blur-xl shadow-3xl lg:rounded-[40px] flex flex-col transition-all duration-500",
           !selectedId ? "hidden lg:flex" : "flex"
         )}
+        id={`${selectedId}`}
       >
         {activeNote ? (
           <>
@@ -808,7 +822,7 @@ export function Notes() {
             </header>
 
             {/* Lienzo de Escritura */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 ">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 min-h-full">
                 {/* Cabecera del Documento */}
                 <div className="space-y-3 sm:space-y-4 md:space-y-6 mb-6 sm:mb-8 md:mb-10 lg:mb-12">
