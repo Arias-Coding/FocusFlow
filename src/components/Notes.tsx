@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -113,27 +113,30 @@ function Callout({
   return (
     <div
       className={cn(
-        "my-4 sm:my-6 p-3 sm:p-4 rounded-lg border-l-4 shadow-sm",
+        "my-4 sm:my-6 md:my-8 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl border-l-4 shadow-sm",
         config.bgColor,
         config.borderColor
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 sm:gap-4">
         <Icon
-          className={cn("w-5 h-5 mt-0.5 flex-shrink-0", config.iconColor)}
+          className={cn(
+            "w-5 sm:w-6 h-5 sm:h-6 mt-0.5 flex-shrink-0",
+            config.iconColor
+          )}
         />
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {title && (
             <div
               className={cn(
-                "font-semibold text-sm sm:text-base mb-2",
+                "font-semibold text-xs sm:text-sm md:text-base mb-2",
                 config.titleColor
               )}
             >
               {title}
             </div>
           )}
-          <div className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          <div className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed sm:leading-6 md:leading-7">
             {children}
           </div>
         </div>
@@ -167,22 +170,22 @@ function CodeBlock({
   };
 
   return (
-    <div className="my-4 sm:my-6 rounded-lg border border-primary/10 overflow-hidden shadow-lg">
-      <div className="bg-primary/10 px-4 py-2 flex justify-between items-center border-b border-primary/10">
-        <span className="text-xs font-mono text-primary uppercase font-semibold">
+    <div className="my-4 sm:my-6 md:my-8 rounded-lg sm:rounded-xl border border-primary/10 overflow-hidden shadow-lg">
+      <div className="bg-primary/10 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center border-b border-primary/10">
+        <span className="text-xs sm:text-sm font-mono text-primary uppercase font-semibold">
           {language}
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-primary/20 hover:bg-primary/30 text-primary transition-colors"
+          className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 rounded bg-primary/20 hover:bg-primary/30 text-primary transition-colors"
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3" /> Copiado
+              <Check className="h-3 w-3 sm:h-4 sm:w-4" /> Copiado
             </>
           ) : (
             <>
-              <Copy className="h-3 w-3" /> Copiar
+              <Copy className="h-3 w-3 sm:h-4 sm:w-4" /> Copiar
             </>
           )}
         </button>
@@ -190,7 +193,7 @@ function CodeBlock({
       <SyntaxHighlighter
         language={language}
         style={atomDark}
-        className="!bg-zinc-950 !m-0 text-xs sm:text-sm rounded-b-lg"
+        className="!bg-zinc-950 !m-0 text-xs sm:text-sm md:text-base rounded-b-lg"
         showLineNumbers={true}
         wrapLongLines={true}
       >
@@ -208,12 +211,31 @@ function MarkdownEditor({
   content: string;
   onChange: (val: string) => void;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+  }, [content]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+    if (e.target) {
+      e.target.style.height = "auto";
+      e.target.style.height = e.target.scrollHeight + "px";
+    }
+  };
+
   return (
     <Textarea
+      ref={textareaRef}
       value={content}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={handleChange}
       placeholder="Escribe tus pensamientos aquí..."
-      className="w-full bg-transparent border-none resize-none focus-visible:ring-0 p-0 text-base sm:text-lg leading-relaxed min-h-[400px] sm:min-h-[500px] font-sans text-foreground/80 placeholder:text-muted-foreground/30 selection:bg-primary/30"
+      className="w-full bg-transparent border-none resize-none focus-visible:ring-0 p-0 text-base sm:text-lg md:text-xl lg:text-2xl leading-7 sm:leading-8 md:leading-9 lg:leading-10 min-h-[400px] font-sans text-foreground/80 placeholder:text-muted-foreground/30 selection:bg-primary/30 overflow-hidden"
     />
   );
 }
@@ -252,11 +274,10 @@ function MarkdownPreview({ content }: { content: string }) {
       prose-h4:text-base prose-h4:mt-4 prose-h4:mb-2
       prose-h5:text-sm prose-h5:mt-4 prose-h5:mb-2 prose-h5:font-semibold
       prose-h6:text-sm prose-h6:mt-4 prose-h6:mb-2 prose-h6:font-semibold prose-h6:text-muted-foreground
-      prose-p:text-muted-foreground prose-p:leading-7 prose-p:mb-3 prose-p:text-sm sm:prose-p:text-base sm:prose-p:leading-8 sm:prose-p:mb-4
-      prose-strong:text-foreground prose-strong:font-bold
-      prose-em:text-foreground/90 prose-em:italic
-      prose-ul:my-4 prose-ul:space-y-1 prose-li:my-1 prose-li:marker:text-primary
-      prose-ol:my-4 prose-ol:space-y-1
+      prose-p:text-muted-foreground prose-p:leading-7 prose-p:mb-4 prose-p:text-base sm:prose-p:text-lg sm:prose-p:leading-8 md:prose-p:text-xl md:prose-p:leading-9 lg:prose-p:text-2xl lg:prose-p:leading-10 sm:prose-p:mb-5 md:prose-p:mb-6
+      prose-li:text-base sm:prose-li:text-lg md:prose-li:text-xl lg:prose-li:text-2xl prose-li:marker:text-primary
+      prose-ul:my-4 sm:prose-ul:my-6 md:prose-ul:my-8 prose-ul:ml-6 sm:prose-ul:ml-8 md:prose-ul:ml-10 prose-ul:space-y-2 sm:prose-ul:space-y-3 md:prose-ul:space-y-4 prose-ul:list-outside prose-ul:list-disc
+      prose-ol:my-4 sm:prose-ol:my-6 md:prose-ol:my-8 prose-ol:ml-6 sm:prose-ol:ml-8 md:prose-ol:ml-10 prose-ol:space-y-2 sm:prose-ol:space-y-3 md:prose-ol:space-y-4 prose-ol:list-outside prose-ol:list-decimal
       prose-blockquote:border-l-4 prose-blockquote:border-primary/30 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:rounded-r-md prose-blockquote:text-sm
       prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono
       prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-white/5 prose-pre:shadow-2xl prose-pre:rounded-lg prose-pre:p-3 prose-pre:overflow-x-auto prose-pre:text-xs
@@ -280,22 +301,22 @@ function MarkdownPreview({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => (
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-4 sm:mb-6 pb-2 border-b border-border/50 mt-6 sm:mt-8 first:mt-0">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-foreground mb-4 sm:mb-6 pb-2 border-b border-border/50 mt-6 sm:mt-8 first:mt-0">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-primary mb-3 sm:mb-4 pb-1 border-b border-primary/20 mt-8 sm:mt-10">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-primary mb-3 sm:mb-4 pb-1 border-b border-primary/20 mt-8 sm:mt-10">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-primary/80 mb-2 sm:mb-3 mt-6 sm:mt-8">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-primary/80 mb-2 sm:mb-3 mt-6 sm:mt-8">
               {children}
             </h3>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary/30 pl-4 sm:pl-6 italic bg-primary/5 py-2 rounded-r-md my-4 sm:my-6 text-sm sm:text-base">
+            <blockquote className="border-l-4 border-primary/30 pl-4 sm:pl-6 italic bg-primary/5 py-2 rounded-r-md my-4 sm:my-6 text-sm sm:text-base md:text-lg">
               {children}
             </blockquote>
           ),
@@ -304,7 +325,7 @@ function MarkdownPreview({ content }: { content: string }) {
             const isInline = !className || !className.includes("language-");
             if (isInline) {
               return (
-                <code className="text-primary bg-primary/10 px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono">
+                <code className="text-primary bg-primary/10 px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm md:text-base font-mono">
                   {children}
                 </code>
               );
@@ -331,7 +352,7 @@ function MarkdownPreview({ content }: { content: string }) {
             return <CodeBlock className={className}>{codeContent}</CodeBlock>;
           },
           mark: ({ children }) => (
-            <mark className="bg-yellow-200 dark:bg-yellow-600/30 text-yellow-900 dark:text-yellow-100 px-1 py-0.5 rounded-sm font-medium">
+            <mark className="bg-primary/20 dark:bg-primary/30 text-primary font-semibold px-1 py-0.5 rounded-sm">
               {children}
             </mark>
           ),
@@ -367,7 +388,7 @@ function MarkdownPreview({ content }: { content: string }) {
                         return <code className={className}>{children}</code>;
                       },
                       mark: ({ children }) => (
-                        <mark className="bg-yellow-200 dark:bg-yellow-600/30 text-yellow-900 dark:text-yellow-100 px-1 py-0.5 rounded-sm font-medium">
+                        <mark className="bg-primary/20 dark:bg-primary/30 text-primary font-semibold px-1 py-0.5 rounded-sm">
                           {children}
                         </mark>
                       ),
@@ -381,22 +402,46 @@ function MarkdownPreview({ content }: { content: string }) {
             return <div {...props}>{children}</div>;
           },
           ul: ({ children }) => (
-            <ul className="my-4 sm:my-6 space-y-1 sm:space-y-2 ml-4 sm:ml-6">
+            <ul className="my-4 sm:my-6 md:my-8 space-y-2 sm:space-y-3 md:space-y-4 ml-6 sm:ml-8 md:ml-10 list-none">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="my-4 sm:my-6 space-y-1 sm:space-y-2 ml-4 sm:ml-6">
+            <ol className="my-4 sm:my-6 md:my-8 space-y-2 sm:space-y-3 md:space-y-4 ml-6 sm:ml-8 md:ml-10 list-none">
               {children}
             </ol>
           ),
-          li: ({ children }) => (
-            <li className="text-muted-foreground leading-6 sm:leading-7 marker:text-primary text-sm sm:text-base my-1">
-              {children}
-            </li>
-          ),
+          li: ({ children, ...props }) => {
+            const isNested = (props as any).className?.includes("nested");
+            const isOrdered = (props as any).className?.includes("ol");
+            let counter = 1;
+
+            return (
+              <li
+                className="text-muted-foreground leading-7 sm:leading-8 md:leading-9 text-lg sm:text-xl md:text-2xl lg:text-2xl my-1 sm:my-2 relative pl-6 sm:pl-8"
+                style={
+                  {
+                    listStyleType: "none",
+                    marginLeft: isNested ? "1.5rem" : "0",
+                    counterIncrement: isOrdered ? "item" : "none",
+                  } as React.CSSProperties
+                }
+              >
+                {isOrdered ? (
+                  <span className="absolute left-0 text-primary font-bold">
+                    {`${(props as any).value || counter}.`}
+                  </span>
+                ) : (
+                  <span className="absolute left-0 text-primary text-lg">
+                    {isNested ? "◎" : "◉"}
+                  </span>
+                )}
+                {children}
+              </li>
+            );
+          },
           p: ({ children }) => (
-            <p className="text-muted-foreground leading-6 sm:leading-8 mb-3 sm:mb-4 last:mb-0 text-sm sm:text-base">
+            <p className="text-muted-foreground leading-7 sm:leading-8 md:leading-9 mb-4 sm:mb-5 md:mb-6 last:mb-0 text-lg sm:text-xl md:text-2xl lg:text-2xl">
               {children}
             </p>
           ),
@@ -406,21 +451,23 @@ function MarkdownPreview({ content }: { content: string }) {
           em: ({ children }) => (
             <em className="text-foreground/90 italic">{children}</em>
           ),
-          hr: () => <hr className="border-border/50 my-6 sm:my-8" />,
+          hr: () => <hr className="border-border/50 my-6 sm:my-8 md:my-10" />,
           table: ({ children }) => (
-            <div className="overflow-x-auto my-4 sm:my-6">
-              <table className="border-collapse border border-border/50 min-w-full text-xs sm:text-sm">
+            <div className="overflow-x-auto my-4 sm:my-6 md:my-8">
+              <table className="border-collapse border border-border/50 min-w-full text-xs sm:text-sm md:text-base">
                 {children}
               </table>
             </div>
           ),
           th: ({ children }) => (
-            <th className="bg-muted/50 border border-border/50 px-4 py-2 text-left font-semibold">
+            <th className="bg-muted/50 border border-border/50 px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left font-semibold text-xs sm:text-sm md:text-base">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-border/50 px-4 py-2">{children}</td>
+            <td className="border border-border/50 px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base">
+              {children}
+            </td>
           ),
           a: ({ href, children }) => (
             <a
@@ -613,10 +660,10 @@ export function Notes() {
 
   return (
     <div className="w-full max-w-7xl mx-auto h-auto lg:h-[85vh] flex flex-col lg:flex-row gap-0 lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700">
-      {/* SIDEBAR: Estilo Panel de Control */}
+      {/* SIDEBAR: Estilo Panel de Control - Bloque Separado */}
       <aside
         className={cn(
-          "w-full lg:w-[380px] flex flex-col bg-background lg:bg-transparent border-b lg:border-none",
+          "w-full lg:w-[380px] flex flex-col bg-background lg:bg-transparent border-b lg:border-none sticky top-0 lg:relative z-20 lg:z-auto lg:h-fit",
           selectedId ? "hidden lg:flex" : "flex"
         )}
       >
@@ -696,10 +743,10 @@ export function Notes() {
         </div>
       </aside>
 
-      {/* EDITOR: Estilo "Canvas" Ancho */}
+      {/* EDITOR: Estilo "Canvas" Ancho - Bloque Separado */}
       <Card
         className={cn(
-          "flex-1 border-none lg:border border-border/40 bg-card/40 backdrop-blur-xl shadow-3xl lg:rounded-[40px] flex flex-col overflow-hidden transition-all duration-500",
+          "flex-1 border-none lg:border border-border/40 bg-card/40 backdrop-blur-xl shadow-3xl lg:rounded-[40px] flex flex-col transition-all duration-500 min-h-screen lg:min-h-[85vh]",
           !selectedId ? "hidden lg:flex" : "flex"
         )}
       >
@@ -762,36 +809,36 @@ export function Notes() {
 
             {/* Lienzo de Escritura */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 py-4 sm:py-6 md:py-8 lg:py-12">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 min-h-full">
                 {/* Cabecera del Documento */}
-                <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                <div className="space-y-3 sm:space-y-4 md:space-y-6 mb-6 sm:mb-8 md:mb-10 lg:mb-12">
                   <div className="flex items-center gap-3 sm:gap-4 group">
-                    <div className="h-6 w-1 sm:h-8 sm:w-1.5 bg-primary/30 group-hover:bg-primary transition-colors rounded-full" />
+                    <div className="h-6 sm:h-7 md:h-8 w-1 sm:w-1.5 bg-primary/30 group-hover:bg-primary transition-colors rounded-full" />
                     <input
                       type="text"
                       value={activeNote.title}
                       onChange={(e) =>
                         updateNote(activeNote.id, "title", e.target.value)
                       }
-                      className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-black bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/10"
+                      className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black bg-transparent border-none outline-none focus:ring-0 w-full tracking-tight placeholder:text-muted-foreground/10"
                       placeholder="Título del Proyecto"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-3 sm:px-5">
                     <div className="flex flex-col">
-                      <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
+                      <span className="text-[9px] sm:text-[10px] uppercase text-muted-foreground/50 font-bold">
                         Última edición
                       </span>
-                      <span className="text-xs font-semibold">
+                      <span className="text-xs sm:text-sm font-semibold">
                         {activeNote.date}
                       </span>
                     </div>
                     <div className="hidden sm:block w-px h-6 bg-border/40" />
                     <div className="flex flex-col">
-                      <span className="text-[10px] uppercase text-muted-foreground/50 font-bold">
+                      <span className="text-[9px] sm:text-[10px] uppercase text-muted-foreground/50 font-bold">
                         Formato
                       </span>
-                      <span className="text-xs font-semibold">
+                      <span className="text-xs sm:text-sm font-semibold">
                         Markdown / UTF-8
                       </span>
                     </div>

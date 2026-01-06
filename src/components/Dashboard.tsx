@@ -107,7 +107,7 @@ export function Dashboard() {
   );
 
   return (
-    <PageLayout>
+    <PageLayout className="animate-in fade-in duration-700">
       <PageHeader
         title="¡Bienvenido de vuelta!"
         subtitle="Tu día de productividad comienza aquí"

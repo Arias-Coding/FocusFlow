@@ -226,7 +226,7 @@ export function Pomodoro() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-[800px] p-6 lg:p-20 animate-in fade-in zoom-in duration-1000">
+    <div className="fixed inset-0 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-20 animate-in fade-in zoom-in duration-1000 overflow-y-auto">
       {/* CONTENEDOR DE LA BARRA DE ESTADÍSTICAS */}
       <div className="w-full max-w-xl px-2 sm:px-4 mb-20 sm:mb-25 relative animate-in slide-in-from-top-8 duration-1000 delay-200">
         {/* BOTÓN DE CONFIGURACIÓN FLOTANTE (Fuera del box) */}
