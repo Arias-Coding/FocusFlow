@@ -9,9 +9,7 @@ import {
   Brain,
   Settings2,
   ChevronRight,
-  BarChart3,
   Timer,
-  CheckCircle2,
 } from "lucide-react";
 import {
   Dialog,
