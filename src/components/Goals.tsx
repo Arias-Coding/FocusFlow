@@ -12,7 +12,9 @@ import {
   Trophy,
   Zap,
   Calendar,
+  ChevronDown,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/context/AuthContext";
 import { goalService } from "@/lib/appwrite";
 
@@ -130,6 +132,7 @@ export function Goals() {
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>(EXAMPLE_GOALS); // Usando goals de ejemplo
   const [selectedQuarter, setSelectedQuarter] = useState<1 | 2 | 3>(1);
+  const [isNewGoalOpen, setIsNewGoalOpen] = useState(false);
   const [newGoal, setNewGoal] = useState({
     objetivo_aspiracional: "",
     indicadores_exito_lag: "",
@@ -146,9 +149,44 @@ export function Goals() {
 
   // Mapeo de cuatrimestres a meses
   const quartersInfo = {
-    1: { months: "Enero - Abril", weeks: "Semanas 1-12" },
-    2: { months: "Mayo - Agosto", weeks: "Semanas 13-24" },
-    3: { months: "Septiembre - Diciembre", weeks: "Semanas 25-36" },
+    1: {
+      months: "Enero - Abril",
+      weeks: "Semanas 1-12",
+      monthsArray: ["Enero", "Febrero", "Marzo", "Abril"],
+    },
+    2: {
+      months: "Mayo - Agosto",
+      weeks: "Semanas 13-24",
+      monthsArray: ["Mayo", "Junio", "Julio", "Agosto"],
+    },
+    3: {
+      months: "Septiembre - Diciembre",
+      weeks: "Semanas 25-36",
+      monthsArray: ["Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    },
+  };
+
+  // Calcular progreso por mes dentro del cuatrimestre
+  const getMonthProgress = (monthIndex: number): number => {
+    const monthGoals = goalsForQuarter.filter((goal) => {
+      const [startWeek, endWeek] = goal.periodo.semanas;
+      const monthWeekRange = {
+        0: [1, 4.25],
+        1: [4.26, 8.5],
+        2: [8.51, 12.75],
+        3: [12.76, 17],
+      };
+      const [monthStart, monthEnd] = monthWeekRange[
+        monthIndex as keyof typeof monthWeekRange
+      ] || [0, 0];
+      return startWeek <= monthEnd && endWeek >= monthStart;
+    });
+
+    if (monthGoals.length === 0) return 0;
+    return Math.round(
+      monthGoals.reduce((sum, g) => sum + g.estado_progreso, 0) /
+        monthGoals.length
+    );
   };
 
   // Calcular promedio de progreso del cuatrimestre
@@ -304,84 +342,100 @@ export function Goals() {
 
       {/* Add New Goal */}
       <Card className="mb-6 sm:mb-8 group hover:scale-[1.01] transition-all duration-300">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Nuevo Objetivo - Cuatrimestre {selectedQuarter}
-          </CardTitle>
+        <CardHeader
+          className="cursor-pointer select-none"
+          onClick={() => setIsNewGoalOpen(!isNewGoalOpen)}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Nuevo Objetivo - Cuatrimestre {selectedQuarter}
+            </CardTitle>
+            <ChevronDown
+              className={cn(
+                "w-5 h-5 transition-transform duration-300",
+                isNewGoalOpen && "rotate-180"
+              )}
+            />
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            placeholder="Nombre del objetivo (ej. Lanzar mi MVP)"
-            value={newGoal.objetivo_aspiracional}
-            onChange={(e) =>
-              setNewGoal({ ...newGoal, objetivo_aspiracional: e.target.value })
-            }
-            className="bg-white/5 border-white/10 focus:border-primary/50"
-          />
-
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Indicadores de Éxito (uno por línea)
-            </label>
-            <Textarea
-              placeholder="ej. 100 usuarios pagos&#10;ej. 50 clientes activos"
-              value={newGoal.indicadores_exito_lag}
+        {isNewGoalOpen && (
+          <CardContent className="space-y-4 border-t border-white/10 pt-4">
+            <Input
+              placeholder="Nombre del objetivo (ej. Lanzar mi MVP)"
+              value={newGoal.objetivo_aspiracional}
               onChange={(e) =>
                 setNewGoal({
                   ...newGoal,
-                  indicadores_exito_lag: e.target.value,
+                  objetivo_aspiracional: e.target.value,
                 })
               }
-              className="bg-white/5 border-white/10 focus:border-primary/50 resize-none"
-              rows={2}
+              className="bg-white/5 border-white/10 focus:border-primary/50"
             />
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Frecuencia de Tácticas
+                Indicadores de Éxito (uno por línea)
               </label>
-              <select
-                value={newGoal.frecuencia}
+              <Textarea
+                placeholder="ej. 100 usuarios pagos&#10;ej. 50 clientes activos"
+                value={newGoal.indicadores_exito_lag}
                 onChange={(e) =>
                   setNewGoal({
                     ...newGoal,
-                    frecuencia: e.target.value as "diaria" | "semanal",
+                    indicadores_exito_lag: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-md text-sm"
-              >
-                <option value="diaria">Diaria</option>
-                <option value="semanal">Semanal</option>
-              </select>
+                className="bg-white/5 border-white/10 focus:border-primary/50 resize-none"
+                rows={2}
+              />
             </div>
-          </div>
 
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Tácticas Semanales (una por línea)
-            </label>
-            <Textarea
-              placeholder="ej. Contactar 5 prospectos diarios&#10;ej. Publicar 2 posts en redes sociales"
-              value={newGoal.tacticas_semanales_lead}
-              onChange={(e) =>
-                setNewGoal({
-                  ...newGoal,
-                  tacticas_semanales_lead: e.target.value,
-                })
-              }
-              className="bg-white/5 border-white/10 focus:border-primary/50 resize-none"
-              rows={3}
-            />
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Frecuencia de Tácticas
+                </label>
+                <select
+                  value={newGoal.frecuencia}
+                  onChange={(e) =>
+                    setNewGoal({
+                      ...newGoal,
+                      frecuencia: e.target.value as "diaria" | "semanal",
+                    })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-md text-sm"
+                >
+                  <option value="diaria">Diaria</option>
+                  <option value="semanal">Semanal</option>
+                </select>
+              </div>
+            </div>
 
-          <Button onClick={addGoal} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Agregar Objetivo
-          </Button>
-        </CardContent>
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Tácticas Semanales (una por línea)
+              </label>
+              <Textarea
+                placeholder="ej. Contactar 5 prospectos diarios&#10;ej. Publicar 2 posts en redes sociales"
+                value={newGoal.tacticas_semanales_lead}
+                onChange={(e) =>
+                  setNewGoal({
+                    ...newGoal,
+                    tacticas_semanales_lead: e.target.value,
+                  })
+                }
+                className="bg-white/5 border-white/10 focus:border-primary/50 resize-none"
+                rows={3}
+              />
+            </div>
+
+            <Button onClick={addGoal} className="w-full">
+              <Plus className="w-4 h-4 mr-2" />
+              Agregar Objetivo
+            </Button>
+          </CardContent>
+        )}
       </Card>
 
       {/* Goals List */}
@@ -536,6 +590,57 @@ export function Goals() {
           ))}
         </div>
       )}
+
+      {/* Months Progress Section */}
+      <div className="mt-12 pt-8 border-t border-white/10">
+        <h2 className="text-2xl font-bold mb-6">Progreso por Mes</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {quartersInfo[selectedQuarter as 1 | 2 | 3].monthsArray.map(
+            (month, idx) => {
+              const monthProgress = getMonthProgress(idx);
+              const isCurrentMonth =
+                new Date().getMonth() ===
+                (selectedQuarter === 1
+                  ? idx
+                  : selectedQuarter === 2
+                  ? idx + 4
+                  : idx + 8);
+
+              return (
+                <div
+                  key={idx}
+                  className={cn(
+                    "relative p-1 rounded-[24px] transition-all duration-500",
+                    isCurrentMonth &&
+                      "bg-linear-to-br from-primary/20 to-transparent shadow-2xl shadow-primary/10"
+                  )}
+                >
+                  <Card
+                    className={cn(
+                      "p-4 capitalize transition-all duration-500 text-center",
+                      "backdrop-blur-xl border border-white/20",
+                      isCurrentMonth
+                        ? "bg-card/80 scale-105 border-primary/20"
+                        : "bg-card/40 shadow-[0_8px_16px_rgba(0,0,0,0.08)]"
+                    )}
+                  >
+                    <h3 className="text-sm font-bold tracking-wider mb-3 uppercase">
+                      {month}
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="text-3xl font-bold">{monthProgress}%</div>
+                      <Progress value={monthProgress} className="h-2" />
+                    </div>
+                    {isCurrentMonth && (
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary animate-ping" />
+                    )}
+                  </Card>
+                </div>
+              );
+            }
+          )}
+        </div>
+      </div>
     </div>
   );
 }
