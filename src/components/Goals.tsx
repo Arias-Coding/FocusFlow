@@ -5,18 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  Target,
-  Plus,
-  CheckCircle2,
-  Trophy,
-  Zap,
-  Calendar,
-  ChevronDown,
-} from "lucide-react";
+import { Target, Plus, Trophy, Zap, Calendar, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/components/context/AuthContext";
-import { goalService } from "@/lib/appwrite";
 
 // Estructura mejorada de Goal
 interface Goal {
@@ -128,12 +118,18 @@ const EXAMPLE_GOALS: Goal[] = [
   },
 ];
 
+type newGoal = {
+  objetivo_aspiracional: string;
+  indicadores_exito_lag: string;
+  tacticas_semanales_lead: string;
+  frecuencia: "diaria" | "semanal";
+};
+
 export function Goals() {
-  const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>(EXAMPLE_GOALS); // Usando goals de ejemplo
   const [selectedQuarter, setSelectedQuarter] = useState<1 | 2 | 3>(1);
   const [isNewGoalOpen, setIsNewGoalOpen] = useState(false);
-  const [newGoal, setNewGoal] = useState({
+  const [newGoal, setNewGoal] = useState<newGoal>({
     objetivo_aspiracional: "",
     indicadores_exito_lag: "",
     tacticas_semanales_lead: "",
@@ -271,7 +267,7 @@ export function Goals() {
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 max-w-7xl mx-auto animate-in fade-in duration-1000">
+    <div className="min-h-screen my-25 px-5 max-w-7xl mx-auto animate-in fade-in duration-1000">
       {/* Header */}
       <div className="mb-6 sm:mb-8 text-center">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tighter mb-2">
@@ -504,7 +500,7 @@ export function Goals() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className="w-16 h-8 text-xs"
+                      className="w-12 h-8 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>
@@ -535,7 +531,7 @@ export function Goals() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className="w-16 h-8 text-xs"
+                      className="w-12 h-8 text-xs hide [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>

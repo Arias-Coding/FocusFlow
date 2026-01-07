@@ -107,7 +107,7 @@ export function Dashboard() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [goals, setGoals] = useState<Goal[]>(EXAMPLE_GOALS);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [quote, setQuote] = useState("");
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
@@ -127,6 +127,7 @@ export function Dashboard() {
   );
 
   useEffect(() => {
+    setGoals(EXAMPLE_GOALS);
     // Random quote
     setQuote(
       motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]
@@ -218,10 +219,10 @@ export function Dashboard() {
   const getHeatmapColor = (intensity: number): string => {
     const colors = [
       "bg-white/10",
-      "bg-green-500/40",
-      "bg-green-500/60",
-      "bg-green-500/80",
-      "bg-green-500",
+      "bg-primary/40",
+      "bg-primary/60",
+      "bg-primary/80",
+      "bg-primary",
     ];
     return colors[intensity] || "bg-white/10";
   };
