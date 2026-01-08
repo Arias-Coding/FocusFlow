@@ -59,6 +59,8 @@ export const noteService = {
     }
 };
 
+
+// --- SERVICIO DE TAREAS ---
 export const taskService = {
     async createTask(userId: string, text: string) {
         return await databases.createDocument(
@@ -95,6 +97,8 @@ export const taskService = {
     }
 };
 
+
+// --- SERVICIO DE HABITOS ---
 export const habitService = {
   async createHabit(userId: string, name: string) {
     return await databases.createDocument(
@@ -119,6 +123,14 @@ export const habitService = {
       import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
       documentId,
       { completedDays: days, streak: streak }
+    );
+  },
+
+  async deleteHabit(documentId: string) {
+    return await databases.deleteDocument(
+      DB_ID,
+      import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
+      documentId
     );
   }
 };

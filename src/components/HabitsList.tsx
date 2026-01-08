@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, CheckCircle2, Flame, Sparkles } from "lucide-react";
+import { Plus, CheckCircle2, Flame, Sparkles, Trash2 } from "lucide-react";
 import { cn, addXP, triggerConfetti } from "@/lib/utils";
 
 import useSound from "use-sound";
@@ -150,13 +150,26 @@ export function HabitsList() {
     }
   };
 
+  // 6. Acción de Eliminar
+  const deleteHabit = async (habitId: string) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este hábito?")) return;
+
+    try {
+      await habitService.deleteHabit(habitId);
+      setHabits((prev) => prev.filter((h) => h.id !== habitId));
+      playAdd(); // Reusing the sound for consistency
+    } catch (error) {
+      console.error("Error eliminando hábito:", error);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="p-20 text-center animate-pulse">Cargando rituales...</div>
     );
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 lg:p-8 space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+    <div className="w-full max-w-5xl mx-auto px-4 py-18 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       {/* Encabezado Estilo Dashboard */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 px-2">
         <div className="space-y-2">
@@ -247,9 +260,19 @@ export function HabitsList() {
                     {/* Info del Hábito */}
                     <div className="space-y-3 sm:space-y-4 flex-1">
                       <div className="space-y-1">
-                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight group-hover:text-purple-500 transition-colors">
-                          {habit.name}
-                        </h3>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight group-hover:text-purple-500 transition-colors">
+                            {habit.name}
+                          </h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteHabit(habit.id)}
+                            className="opacity-0 lg:group-hover:opacity-100 hover:cursor-pointer h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                           <div className="flex items-center text-pink-500 dark:text-pink-400 font-black text-xs sm:text-sm italic">
                             <Flame className="mr-1 h-4 sm:h-5 w-4 sm:w-5 fill-current" />
@@ -273,7 +296,7 @@ export function HabitsList() {
                     </div>
 
                     {/* Tracker Semanal */}
-                    <div className="flex items-center justify-between lg:justify-end gap-1.5 sm:gap-2 lg:gap-3 overflow-x-auto pb-1 sm:pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <div className="flex items-center justify-between lg:justify-end gap-1.5 sm:gap-2 lg:gap-3">
                       {lastSevenDays.map((date) => {
                         const isCompleted = habit.completedDays.includes(date);
                         const isToday = date === TODAY_STR;

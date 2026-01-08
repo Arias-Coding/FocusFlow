@@ -502,7 +502,7 @@ export default function Settings() {
             variant="ghost"
             disabled={isLoading}
             onClick={handleLogout}
-            className="w-full rounded-2xl text-red-500 hover:text-red-600 hover:bg-red-500/10 font-bold py-6 sm:py-7 text-base sm:text-lg border border-foreground/5 transition-all"
+            className="w-full rounded-2xl text-red-500 hover:text-red-600 hover:cursor-pointer hover:bg-red-500/10 font-bold py-6 sm:py-7 text-base sm:text-lg border border-foreground/5 transition-all"
           >
             {isLoading ? (
               <Loader2 className="animate-spin" />

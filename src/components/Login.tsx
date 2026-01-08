@@ -3,21 +3,29 @@ import { useAuth } from "@/components/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, Sparkles } from "lucide-react";
+import { LogIn, Sparkles, UserPlus } from "lucide-react";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { login, signup } = useAuth();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
     try {
-      await login(email, password);
-    } catch (error) {
-      alert("Error al iniciar sesión. Verifica tus credenciales.");
+      if (isSignUp) {
+        await signup(email, password);
+      } else {
+        await login(email, password);
+      }
+    } catch {
+      const message = isSignUp
+        ? "Error al crear la cuenta. El email podría estar en uso."
+        : "Error al iniciar sesión. Verifica tus credenciales.";
+      alert(message);
     } finally {
       setIsLoggingIn(false);
     }
@@ -63,9 +71,27 @@ export function Login() {
               className="w-full h-12 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
               disabled={isLoggingIn}
             >
-              {isLoggingIn ? "Entrando..." : "Iniciar Sesión"}
-              <LogIn className="ml-2 h-4 w-4" />
+              {isLoggingIn
+                ? (isSignUp ? "Creando cuenta..." : "Entrando...")
+                : (isSignUp ? "Crear Cuenta" : "Iniciar Sesión")
+              }
+              {isSignUp ? <UserPlus className="ml-2 h-4 w-4" /> : <LogIn className="ml-2 h-4 w-4" />}
             </Button>
+
+            <div className="text-center mt-4">
+              <Button
+                variant="ghost"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-sm text-muted-foreground hover:text-foreground"
+                disabled={isLoggingIn}
+              >
+                {isSignUp
+                  ? "¿Ya tienes cuenta? Inicia sesión"
+                  : "¿No tienes cuenta? Regístrate"
+                }
+              </Button>
+            </div>
+
             <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest mt-4">
               Protegido por Appwrite Cloud
             </p>

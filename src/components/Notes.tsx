@@ -661,7 +661,7 @@ export function Notes() {
   //    h-[${height}px]
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-0 lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700 relative">
+    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-0 min-h-screen lg:gap-6 p-0 lg:p-6 animate-in fade-in duration-700 relative">
       {/* SIDEBAR: Estilo Panel de Control - Bloque Separado */}
 
       <aside

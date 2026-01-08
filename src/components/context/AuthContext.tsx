@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { account } from "@/lib/appwrite";
-import { type Models } from "appwrite";
+import { type Models, ID } from "appwrite";
 
 interface AuthContextType {
   user: Models.User<Models.Preferences> | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<void>;
+  signup: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -40,13 +41,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(session);
   };
 
+  const signup = async (email: string, pass: string) => {
+    // Crear cuenta de usuario
+    await account.create(ID.unique(), email, pass);
+    // Crear sesión automáticamente después de crear la cuenta
+    await account.createEmailPasswordSession(email, pass);
+    const session = await account.get();
+    setUser(session);
+  };
+
   const logout = async () => {
     await account.deleteSession("current");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

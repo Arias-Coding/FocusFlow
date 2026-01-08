@@ -12,7 +12,7 @@ Una suite de productividad de alto rendimiento diseñada bajo la filosofía de "
 - **Música Zen**: Sección de sonidos ambientales (lluvia, fuego, viento, ruido blanco) para sesiones de enfoque con controles intuitivos y estados visuales activos.
 - **Títulos de Pestaña Dinámicos**: Actualización automática del título de la pestaña según el estado del Pomodoro (Enfoque/Descanso/Pausado).
 - **Gestión de Tareas Interactiva**: Lista de tareas reactiva con sonidos de feedback (completar y eliminar), persistencia en la nube con Appwrite, y animaciones micro-interactivas para una experiencia inmersiva.
-- **Tracker de Hábitos Avanzado**: Seguimiento de hábitos diarios con cálculo automático de rachas (streaks), visualización de los últimos 7 días, y persistencia de datos completados.
+ - **Tracker de Hábitos Avanzado**: Seguimiento de hábitos diarios con cálculo automático de rachas (streaks), visualización de los últimos 7 días, persistencia de datos completados, y eliminación de hábitos con confirmación.
 - **Objetivos Anuales**: Seguimiento de metas a largo plazo con secciones de objetivos pendientes y completados, sonidos épicos de logro y persistencia en la nube.
 - **Editor de Notas Markdown "Obsidian-Style"**: Sistema de toma de notas con soporte GFM (GitHub Flavored Markdown), previsualización en tiempo real, tipografía optimizada para lectura prolongada y sidebar para navegación.
 - **Visualizador de Calendario Anual**: Componente de alta densidad informativa para la gestión temporal, mostrando todos los meses del año actual con énfasis en el mes corriente.
@@ -36,7 +36,7 @@ Una suite de productividad de alto rendimiento diseñada bajo la filosofía de "
 - **Objetivos Anuales**: Seguimiento de metas a largo plazo con celebración de logros completados.
 - **Temas Ambientales Avanzados**: Temas "Bosque" y "Océano" además de los modos claro/oscuro tradicionales.
 - **Gestión de Tareas con Persistencia**: CRUD completo de tareas con sonidos y animaciones, sincronizado en la nube.
-- **Seguimiento de Hábitos con Rachas**: Sistema de hábitos con visualización semanal y cálculo de streaks.
+ - **Seguimiento de Hábitos con Rachas**: Sistema de hábitos con visualización semanal, cálculo de streaks y gestión completa (crear/eliminar).
 - **Notas Markdown con Preview**: Editor dual (edición/previsualización) con soporte completo de Markdown.
 - **Calendario Anual Interactivo**: Vista completa del año con calendarios mensuales.
 - **Autenticación y Seguridad**: Login seguro con Appwrite, protección de datos de usuario.
@@ -147,28 +147,42 @@ src/
 - **Temas Ambientales Avanzados**: Sistema de temas extendido con variables CSS personalizadas para temas "Bosque" y "Océano" además de los tradicionales claro/oscuro.
 - **Persistencia en la Nube**: Integración completa con Appwrite para sincronización de tareas, hábitos, notas y objetivos entre dispositivos.
 - **Refinamiento de Renderizado**: Uso de estados locales optimizados para el cambio de modos (Editor vs Preview) sin recargas de página.
-- **Estética "Glass"**: Aplicación de capas de transparencia y bordes definidos (`border-white/5`) para lograr una interfaz moderna y limpia.
-- **Responsive Design**: Adaptación de componentes complejos (como el sidebar de notas y el tracker de hábitos) para mantener la funcionalidad en diversos tamaños de ventana.
+ - **Estética "Glass"**: Aplicación de capas de transparencia y bordes definidos (`border-white/5`) para lograr una interfaz moderna y limpia.
+ - **Responsive Design Completo**: Diseño completamente adaptativo con breakpoints optimizados para móviles, tablets y desktop. Navegación flotante inteligente, layouts adaptativos, y componentes que se redimensionan automáticamente manteniendo la funcionalidad completa en todos los dispositivos.
 - **Feedback Multi-sensorial**: Combinación de animaciones visuales, sonidos y micro-interacciones para una experiencia de usuario rica.
 - **Sistema de Celebraciones Confeti**: Implementación de animaciones canvas-confetti con diferentes intensidades según el tipo de logro (tareas, hábitos, niveles).
 - **Persistencia Híbrida Local/Nube**: Arquitectura dual que combina localStorage para funcionamiento offline con sincronización automática a Appwrite.
 - **Exportación de Datos Completa**: Sistema de backup que incluye todas las entidades (tareas, hábitos, notas, objetivos) con metadatos y timestamps.
-- **Plantillas de Hábitos Dinámicas**: Sistema de plantillas con categorías organizadas, interfaz modal moderna y capacidad de personalización.
+ - **Plantillas de Hábitos Dinámicas**: Sistema de plantillas con categorías organizadas, interfaz modal moderna y capacidad de personalización.
+ - **Gestión Completa de Hábitos**: CRUD completo para hábitos incluyendo eliminación con confirmación de usuario, actualización automática de rachas y sincronización en tiempo real con Appwrite.
 
-## 🔮 Future Roadmap
+ ## 📝 Changelog
 
-- [ ] **Notificaciones Push**: Recordatorios inteligentes para tareas pendientes y sesiones de Pomodoro.
-- [ ] **Estadísticas Avanzadas**: Gráficos detallados de productividad con tendencias históricas y análisis de patrones.
-- [ ] **Notificaciones Push**: Recordatorios inteligentes para tareas pendientes y sesiones de Pomodoro.
-- [ ] **Modo Oscuro Mejorado**: Variaciones adicionales del tema oscuro con diferentes intensidades.
-- [ ] **Sincronización Multi-dispositivo**: Mejora de la sincronización en tiempo real entre dispositivos conectados.
-- [ ] **Integración con Calendario**: Sincronización con calendarios externos (Google Calendar, Outlook).
-- [ ] **Modo Enfoque Extremo**: Bloqueo temporal de distracciones con pantalla completa y sonidos ambientales.
+### v1.0.1 (Latest)
+ - ✅ **Eliminar Hábitos**: Añadida funcionalidad completa para eliminar hábitos con confirmación de usuario
+ - ✅ **Responsive Design Optimizado**: Mejora completa del diseño responsivo en todos los componentes
+ - ✅ **Mejora de UX Móvil**: Optimización de navegación y layouts para dispositivos móviles
+ - ✅ **Gestión Completa de Hábitos**: Sistema CRUD completo con eliminación y confirmación
+
+### v1.0.0 (Initial Release)
+ - ✅ Suite de productividad completa con todas las funcionalidades principales
+ - ✅ Integración completa con Appwrite
+ - ✅ Sistema de gamificación XP
+ - ✅ Todos los componentes principales implementados
+
+ ## 🔮 Future Roadmap
+
+ - [ ] **Notificaciones Push**: Recordatorios inteligentes para tareas pendientes y sesiones de Pomodoro.
+ - [ ] **Estadísticas Avanzadas**: Gráficos detallados de productividad con tendencias históricas y análisis de patrones.
+ - [ ] **Modo Oscuro Mejorado**: Variaciones adicionales del tema oscuro con diferentes intensidades.
+ - [ ] **Sincronización Multi-dispositivo**: Mejora de la sincronización en tiempo real entre dispositivos conectados.
+ - [ ] **Integración con Calendario**: Sincronización con calendarios externos (Google Calendar, Outlook).
+ - [ ] **Modo Enfoque Extremo**: Bloqueo temporal de distracciones con pantalla completa y sonidos ambientales.
 
 ---
 
 **FocusFlow** es una suite de productividad completa y lista para producción, desarrollada con enfoque en la **Calidad de Código**, **User Experience** y **Gamificación**. Esta aplicación demuestra la capacidad de crear herramientas complejas con una UI intuitiva, rendimiento excepcional y una experiencia de usuario inmersiva.
 
-**Estado del Proyecto**: ✅ **Completo y Funcional** - Todas las funcionalidades principales y avanzadas implementadas y probadas.
+ **Estado del Proyecto**: ✅ **Completo y Funcional** - Todas las funcionalidades principales y avanzadas implementadas, probadas y optimizadas para diseño responsivo en todos los dispositivos.
 
 ---
