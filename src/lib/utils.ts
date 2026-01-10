@@ -94,3 +94,12 @@ export const removeFromLocalStorage = (key: string) => {
     console.error('Error removing from localStorage:', error);
   }
 };
+
+// Date utilities
+export const normalizeDate = (date: string | Date): string => {
+  if (typeof date === "string" && date.includes("T")) {
+    return date.split("T")[0];
+  }
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toISOString().split("T")[0];
+};

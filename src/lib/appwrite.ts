@@ -83,21 +83,27 @@ export const habitService = {
 
     // Crear un nuevo log (cuando marcas un hábito como hecho)
     async createLog(habitId: string, userId: string, date: string, value: number, completed: boolean) {
+        if (!habitId || !userId || !date || value < 0) {
+            throw new Error("Invalid log data");
+        }
         return await databases.createDocument(
             DB_ID,
             COLLECTIONS.HABITS_LOG,
             ID.unique(),
-            { habitId, userId, date, value, completed }
+            { habitId, userId, date: new Date(date + "T12:00:00").toISOString(), value, completed }
         );
     },
 
     // Crear un nuevo hábito
     async createHabit(userId: string, name: string, type: "boolean" | "count", frequency: string, unit?: string, target?: number) {
+        if (!userId || !name.trim() || !["boolean", "count"].includes(type)) {
+            throw new Error("Invalid habit data");
+        }
         return await databases.createDocument(
             DB_ID,
             COLLECTIONS.HABITS,
             ID.unique(),
-            { userId, name, type, frequency, active: true, streak: 0, unit, target }
+            { userId, name: name.trim(), type, frequency, active: true, streak: 0, unit: unit?.trim(), target }
         );
     },
 
@@ -222,42 +228,7 @@ export const taskService = {
 };
 
 
-/* // --- SERVICIO DE HABITOS ---
-export const habitService = {
-  async createHabit(userId: string, name: string) {
-    return await databases.createDocument(
-      DB_ID,
-      import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
-      ID.unique(),
-      { userId, name, streak: 0, completedDays: [] }
-    );
-  },
 
-  async getHabits(userId: string) {
-    return await databases.listDocuments(
-      DB_ID,
-      import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
-      [Query.equal("userId", userId)]
-    );
-  },
-
-  async updateHabitDays(documentId: string, days: string[], streak: number) {
-    return await databases.updateDocument(
-      DB_ID,
-      import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
-      documentId,
-      { completedDays: days, streak: streak }
-    );
-  },
-
-  async deleteHabit(documentId: string) {
-    return await databases.deleteDocument(
-      DB_ID,
-      import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
-      documentId
-    );
-  }
-}; */
 
 // --- SERVICIO DE OBJETIVOS ---
 export const goalService = {

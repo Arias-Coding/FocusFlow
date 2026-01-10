@@ -8,7 +8,8 @@ import { HabitsList } from "./components/HabitsList.tsx";
 import { CalendarDemo } from "./components/Calendar.tsx";
 import Settings from "./components/Settings.tsx";
 
-import { AuthProvider, useAuth } from "./components/context/AuthContext";
+import { AuthProvider } from "./components/context/AuthContext";
+import { useAuthStore } from "@/lib/stores";
 import { Login } from "./components/Login.tsx";
 import { Zen } from "./components/Zen.tsx";
 import { Dashboard } from "./components/Dashboard.tsx";
@@ -44,7 +45,7 @@ function AppContent() {
     document.title = currentSection;
   }, [currentSection]);
 
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthStore();
 
   if (loading)
     return (

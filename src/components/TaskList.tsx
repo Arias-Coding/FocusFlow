@@ -1,157 +1,68 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Plus, ListChecks } from "lucide-react";
-import {
-  cn,
-  addXP,
-  triggerConfetti,
-  saveToLocalStorage,
-  loadFromLocalStorage,
-} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import useSound from "use-sound";
 import checkSound from "@/assets/sounds/pop-sound.mp3";
 import deleteSound from "@/assets/sounds/del-pop.mp3";
 import bellSound from "@/assets/sounds/notification-bell-sound.mp3";
 
-import { useAuth } from "@/components/context/AuthContext";
-import { taskService } from "@/lib/appwrite";
+import { useAuthStore, useTasksStore } from "@/lib/stores";
 import { PageLayout, PageHeader } from "@/components/ui/layout";
-
-interface Task {
-  id: string; // Cambiado a string para Appwrite
-  text: string;
-  completed: boolean;
-}
 export function TaskList() {
-  const { user } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+  const {
+    tasks,
+    loading: isLoading,
+    newTaskText,
+    fetchTasks,
+    addTask,
+    toggleTask,
+    deleteTask,
+    setNewTaskText
+  } = useTasksStore();
 
   const [playComplete] = useSound(checkSound, { volume: 0.5 });
   const [playDelete] = useSound(deleteSound, { volume: 0.3 });
   const [playAdd] = useSound(bellSound, { volume: 0.3 });
 
-  // 1. Cargar tareas iniciales
+  // Load tasks on mount
   useEffect(() => {
-    const fetchTasks = async () => {
-      if (!user) {
-        // Load from localStorage if no user
-        const localTasks = loadFromLocalStorage("tasks") || [];
-        setTasks(localTasks);
-        setIsLoading(false);
-        return;
-      }
+    fetchTasks(user?.$id);
+  }, [user, fetchTasks]);
 
-      try {
-        const data = await taskService.getTasks(user.$id);
-        const formatted = data.documents.map((doc: any) => ({
-          id: doc.$id,
-          text: doc.text,
-          completed: doc.completed,
-        }));
-        setTasks(formatted);
-        // Save to localStorage as backup
-        saveToLocalStorage("tasks", formatted);
-      } catch (error) {
-        console.error("Error al cargar tareas:", error);
-        // Fallback to localStorage
-        const localTasks = loadFromLocalStorage("tasks") || [];
-        setTasks(localTasks);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTasks();
-  }, [user]);
-
-  // 2. Añadir tarea a la nube
-  const addTask = async () => {
-    if (newTask.trim() === "" || !user) return;
-
-    try {
-      const res = await taskService.createTask(user.$id, newTask);
-      const task: Task = {
-        id: res.$id,
-        text: newTask,
-        completed: false,
-      };
-      const updatedTasks = [task, ...tasks];
-      setTasks(updatedTasks);
-      playAdd();
-      setNewTask("");
-      // Save to localStorage
-      saveToLocalStorage("tasks", updatedTasks);
-    } catch (error) {
-      console.error("Error al guardar tarea:", error);
-      // Still add to local state and localStorage for offline functionality
-      const localTask: Task = {
-        id: `local-${Date.now()}`,
-        text: newTask,
-        completed: false,
-      };
-      const updatedTasks = [localTask, ...tasks];
-      setTasks(updatedTasks);
-      saveToLocalStorage("tasks", updatedTasks);
-      playAdd();
-      setNewTask("");
-    }
+  // Handle add task
+  const handleAddTask = async () => {
+    if (newTaskText.trim() === "" || !user) return;
+    await addTask(user.$id);
+    playAdd();
   };
 
-  // 3. Toggle de estado (Check/Uncheck)
-  const toggleTask = async (id: string) => {
+  // Handle toggle task
+  const handleToggleTask = async (id: string) => {
     const task = tasks.find((t) => t.id === id);
     if (!task) return;
 
     const nextState = !task.completed;
-
-    // UI optimista: actualizamos primero para que sea instantáneo
-    const updatedTasks = tasks.map((t) =>
-      t.id === id ? { ...t, completed: nextState } : t
-    );
-    setTasks(updatedTasks);
-
-    nextState ? playComplete() : playDelete();
-
     if (nextState) {
-      addXP(10); // 10 XP por completar tarea
-      triggerConfetti("task"); // Trigger confetti animation
+      playComplete();
+    } else {
+      playDelete();
     }
 
-    // Save to localStorage immediately
-    saveToLocalStorage("tasks", updatedTasks);
-
-    try {
-      await taskService.toggleTask(id, nextState);
-    } catch (error) {
-      // Si falla, revertimos el cambio
-      setTasks(
-        tasks.map((t) => (t.id === id ? { ...t, completed: !nextState } : t))
-      );
-    }
+    await toggleTask(id);
   };
 
-  // 4. Eliminar de la nube
-  const deleteTask = async (id: string) => {
-    const updatedTasks = tasks.filter((t) => t.id !== id);
-    setTasks(updatedTasks);
+  // Handle delete task
+  const handleDeleteTask = async (id: string) => {
     playDelete();
-
-    // Save to localStorage immediately
-    saveToLocalStorage("tasks", updatedTasks);
-
-    try {
-      await taskService.deleteTask(id);
-    } catch (error) {
-      console.error("Error al borrar tarea:", error);
-      // Revert the change
-      setTasks(tasks);
-      saveToLocalStorage("tasks", tasks);
-    }
+    await deleteTask(id);
   };
+
+
 
   if (isLoading)
     return (
@@ -195,13 +106,13 @@ export function TaskList() {
                 <div className="relative flex gap-3 bg-background rounded-2xl p-2 border border-border/50 shadow-sm">
                   <Input
                     placeholder="¿Qué sigue en tu lista?..."
-                    value={newTask}
-                    onChange={(e) => setNewTask(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addTask()}
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
                     className="bg-transparent border-none focus-visible:ring-0 text-base placeholder:italic"
                   />
                   <Button
-                    onClick={addTask}
+                    onClick={handleAddTask}
                     className="rounded-xl px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95"
                   >
                     <Plus className="h-5 w-5 mr-1" />
@@ -234,7 +145,7 @@ export function TaskList() {
                         <div className="relative flex items-center justify-center">
                           <Checkbox
                             checked={task.completed}
-                            onCheckedChange={() => toggleTask(task.id)}
+                            onCheckedChange={() => handleToggleTask(task.id)}
                             className="h-6 w-6 rounded-lg border-2 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all"
                           />
                         </div>
@@ -252,7 +163,7 @@ export function TaskList() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => deleteTask(task.id)}
+                        onClick={() => handleDeleteTask(task.id)}
                         className="h-10 w-10 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 lg:opacity-0 lg:group-hover:opacity-100 transition-all"
                       >
                         <Trash2 className="h-4 w-4" />

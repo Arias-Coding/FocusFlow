@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Flame, Quote, Target, Trophy, TrendingUp } from "lucide-react";
-import { useAuth } from "@/components/context/AuthContext";
-import { taskService, habitService } from "@/lib/appwrite";
+import { useAuthStore, useTasksStore, useHabitsStore, useGoalsStore } from "@/lib/stores";
 import {
   getXP,
   getLevel,
@@ -12,37 +11,9 @@ import {
   cn,
 } from "@/lib/utils";
 import { PageLayout, PageHeader, CardGrid } from "@/components/ui/layout";
-import { Progress } from "@/components/ui/progress";
 
-interface Task {
-  id: string;
-  text: string;
-  completed: boolean;
-}
 
-interface Habit {
-  id: string;
-  name: string;
-  streak: number;
-  completedDays: string[];
-}
 
-interface Goal {
-  id: string;
-  objetivo_aspiracional: string;
-  periodo: {
-    año: number;
-    cuatrimestre: 1 | 2 | 3;
-    semanas: [number, number];
-  };
-  indicadores_exito_lag: string[];
-  tacticas_semanales_lead: Array<{
-    descripcion: string;
-    frecuencia: "diaria" | "semanal";
-  }>;
-  estado_progreso: number;
-  puntuación_ejecución: number;
-}
 
 const motivationalQuotes = [
   "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
@@ -55,79 +26,25 @@ const motivationalQuotes = [
   "La motivación te pone en marcha, el hábito te mantiene en movimiento.",
 ];
 
-// Datos de ejemplo de objetivos
-const EXAMPLE_GOALS: Goal[] = [
-  {
-    id: "goal-1",
-    objetivo_aspiracional: "Lanzar mi MVP",
-    periodo: {
-      año: 2026,
-      cuatrimestre: 1,
-      semanas: [1, 12],
-    },
-    indicadores_exito_lag: ["100 usuarios pagos", "50 clientes activos"],
-    tacticas_semanales_lead: [
-      {
-        descripcion: "Contactar 5 prospectos diarios",
-        frecuencia: "diaria",
-      },
-      {
-        descripcion: "Publicar 2 posts en redes sociales",
-        frecuencia: "semanal",
-      },
-    ],
-    estado_progreso: 45,
-    puntuación_ejecución: 60,
-  },
-  {
-    id: "goal-2",
-    objetivo_aspiracional: "Obtener 10 clientes pagos",
-    periodo: {
-      año: 2026,
-      cuatrimestre: 1,
-      semanas: [1, 12],
-    },
-    indicadores_exito_lag: ["$5000 en ingresos recurrentes"],
-    tacticas_semanales_lead: [
-      {
-        descripcion: "Enviar 10 propuestas comerciales",
-        frecuencia: "semanal",
-      },
-      {
-        descripcion: "Revisar y optimizar pitch",
-        frecuencia: "semanal",
-      },
-    ],
-    estado_progreso: 30,
-    puntuación_ejecución: 50,
-  },
-];
+// Simplified goals for now - will be enhanced later
 
 export function Dashboard() {
-  const { user } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const { user } = useAuthStore();
+  const { tasks, fetchTasks } = useTasksStore();
+  const { habits, habitLogs, fetchHabitsAndLogs } = useHabitsStore();
+  const { goals, fetchGoals } = useGoalsStore();
+
   const [quote, setQuote] = useState("");
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
   const [previousLevel, setPreviousLevel] = useState(1);
 
-  // Obtener cuatrimestre actual
-  const getCurrentQuarter = (): 1 | 2 | 3 => {
-    const month = new Date().getMonth();
-    if (month < 4) return 1;
-    if (month < 8) return 2;
-    return 3;
-  };
 
-  const currentQuarter = getCurrentQuarter();
-  const currentGoals = goals.filter(
-    (g) => g.periodo.cuatrimestre === currentQuarter
-  );
+
+  const currentYear = new Date().getFullYear();
+  const currentGoals = goals.filter((g) => g.year === currentYear);
 
   useEffect(() => {
-    setGoals(EXAMPLE_GOALS);
     // Random quote
     setQuote(
       motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]
@@ -147,47 +64,47 @@ export function Dashboard() {
 
     setPreviousLevel(currentLevel);
 
-    // Fetch tasks
-    const fetchTasks = async () => {
-      if (!user) return;
-      try {
-        const data = await taskService.getTasks(user.$id);
-        const formatted = data.documents.map((doc: any) => ({
-          id: doc.$id,
-          text: doc.text,
-          completed: doc.completed,
-        }));
-        setTasks(formatted);
-      } catch (error) {
-        console.error("Error loading tasks:", error);
+    // Fetch data from stores
+    if (user?.$id) {
+      fetchTasks(user.$id);
+      fetchHabitsAndLogs(user.$id);
+      // Only fetch goals if collection is configured
+      if (import.meta.env.VITE_APPWRITE_COLLECTION_GOALS_ID) {
+        fetchGoals(user.$id, new Date().getFullYear());
       }
-    };
-
-    // Fetch habits
-    const fetchHabits = async () => {
-      if (!user) return;
-      try {
-        const data = await habitService.getHabits(user.$id);
-        const formatted = data.documents.map((doc: any) => ({
-          id: doc.$id,
-          name: doc.name,
-          streak: doc.streak,
-          completedDays: doc.completedDays || [],
-        }));
-        setHabits(formatted);
-      } catch (error) {
-        console.error("Error loading habits:", error);
-      }
-    };
-
-    fetchTasks();
-    fetchHabits();
-  }, [user]);
+    }
+  }, [user, fetchTasks, fetchHabitsAndLogs, fetchGoals, previousLevel]);
 
   const pendingTasks = tasks.filter((task) => !task.completed);
+
+  // Calculate highest streak from habit logs
+  const calculateStreak = (habitId: string) => {
+    const logs = habitLogs[habitId] || [];
+    const completedDates = logs
+      .filter((log) => log.completed)
+      .map((log) => log.date)
+      .sort();
+    let streak = 0;
+    let checkDate = new Date();
+    let checkDateStr = checkDate.toLocaleDateString("sv-SE");
+    if (!completedDates.includes(checkDateStr)) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkDateStr = checkDate.toLocaleDateString("sv-SE");
+    }
+    while (completedDates.includes(checkDateStr)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkDateStr = checkDate.toLocaleDateString("sv-SE");
+    }
+    return streak;
+  };
+
   const highestStreakHabit = habits.reduce(
-    (max, habit) => (habit.streak > max.streak ? habit : max),
-    { name: "Ninguno", streak: 0, id: "", completedDays: [] }
+    (max, habit) => {
+      const streak = calculateStreak(habit.$id);
+      return streak > max.streak ? { name: habit.name, streak, id: habit.$id } : max;
+    },
+    { name: "Ninguno", streak: 0, id: "" }
   );
 
   // Generar último 30 días
@@ -204,7 +121,7 @@ export function Dashboard() {
   // Calcular intensidad de heatmap para un día (0-4)
   const getHeatmapIntensity = (date: string): number => {
     const completedCount = habits.filter((h) =>
-      h.completedDays.includes(date)
+      (habitLogs[h.$id] || []).some(log => log.date === date && log.completed)
     ).length;
     const totalHabits = habits.length;
     if (totalHabits === 0) return 0;
@@ -377,71 +294,30 @@ export function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Objetivos - Cuatrimestre {currentQuarter}
+              Objetivos - {currentYear}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {currentGoals.map((goal) => (
-                <div
-                  key={goal.id}
-                  className="p-4 rounded-lg border border-white/10 bg-white/2 hover:bg-white/5 transition-all"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm sm:text-base">
-                        {goal.objetivo_aspiracional}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Semanas {goal.periodo.semanas[0]}-
-                        {goal.periodo.semanas[1]}
-                      </p>
+                  <div
+                    key={goal.id}
+                    className="p-4 rounded-lg border border-white/10 bg-white/2 hover:bg-white/5 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-sm sm:text-base">
+                          {goal.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {goal.description}
+                        </p>
+                      </div>
+                      <Badge variant={goal.completed ? "default" : "secondary"}>
+                        {goal.completed ? "Completado" : "Pendiente"}
+                      </Badge>
                     </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span>Progreso</span>
-                        <span className="font-bold">
-                          {goal.estado_progreso}%
-                        </span>
-                      </div>
-                      <Progress value={goal.estado_progreso} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span>Ejecución</span>
-                        <span className="font-bold">
-                          {goal.puntuación_ejecución}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={goal.puntuación_ejecución}
-                        className="h-2"
-                      />
-                    </div>
-                  </div>
-
-                  {goal.indicadores_exito_lag.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-xs font-medium mb-2">
-                        Indicadores LAG:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {goal.indicadores_exito_lag.map((indicator, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            className="text-xs"
-                          >
-                            {indicator}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
               ))}
             </div>
           </CardContent>
@@ -483,7 +359,7 @@ export function Dashboard() {
                             isToday && "border-primary ring-2 ring-primary/50"
                           )}
                           title={`${date}: ${
-                            habits.filter((h) => h.completedDays.includes(date))
+                            habits.filter((h) => (habitLogs[h.$id] || []).some(log => log.date === date && log.completed))
                               .length
                           }/${habits.length} hábitos`}
                         />
