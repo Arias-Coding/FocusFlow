@@ -16,6 +16,130 @@ export const COLLECTIONS = {
     HABITS: import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_ID,
     TASKS: import.meta.env.VITE_APPWRITE_COLLECTION_TASKS_ID,
     GOALS: import.meta.env.VITE_APPWRITE_COLLECTION_GOALS_ID,
+    HABITS_LOG: import.meta.env.VITE_APPWRITE_COLLECTION_HABITS_LOG_ID,
+};
+
+
+// --- SERVICIO DE HÁBITOS ---
+export const habitService = {
+    /**
+     * Sincroniza datos iniciales (Seed)
+     * Útil para la primera carga de la aplicación
+     */
+    async seedHabits(initialHabits: any[], initialHabitLogs: Record<string, any[]>) {
+        try {
+            // Guardar definiciones de hábitos
+            for (const habit of initialHabits) {
+                const { $id, ...data } = habit;
+                await databases.createDocument(
+                    DB_ID,
+                    COLLECTIONS.HABITS,
+                    $id, // Usamos el ID manual (habit_01...)
+                    data
+                );
+            }
+
+            // Guardar historial (logs)
+            for (const habitId in initialHabitLogs) {
+                const logs = initialHabitLogs[habitId];
+                for (const log of logs) {
+                    const { $id, ...logData } = log;
+                    await databases.createDocument(
+                        DB_ID,
+                        COLLECTIONS.HABITS_LOG,
+                        $id, // Usamos el ID manual (log_bool1...)
+                        logData
+                    );
+                }
+            }
+            return { success: true };
+        } catch (error) {
+            console.error("Error en seedHabits:", error);
+            throw error;
+        }
+    },
+
+    // Obtener todos los hábitos de un usuario
+    async getHabits(userId: string) {
+        return await databases.listDocuments(
+            DB_ID,
+            COLLECTIONS.HABITS,
+            [Query.equal("userId", userId)]
+        );
+    },
+
+    // Obtener logs de un hábito específico
+    async getHabitLogs(userId: string, habitId: string) {
+        return await databases.listDocuments(
+            DB_ID,
+            COLLECTIONS.HABITS_LOG,
+            [
+                Query.equal("userId", userId),
+                Query.equal("habitId", habitId),
+                Query.orderDesc("date")
+            ]
+        );
+    },
+
+    // Crear un nuevo log (cuando marcas un hábito como hecho)
+    async createLog(habitId: string, userId: string, date: string, value: number, completed: boolean) {
+        return await databases.createDocument(
+            DB_ID,
+            COLLECTIONS.HABITS_LOG,
+            ID.unique(),
+            { habitId, userId, date, value, completed }
+        );
+    },
+
+    // Crear un nuevo hábito
+    async createHabit(userId: string, name: string, type: "boolean" | "count", frequency: string, unit?: string, target?: number) {
+        return await databases.createDocument(
+            DB_ID,
+            COLLECTIONS.HABITS,
+            ID.unique(),
+            { userId, name, type, frequency, active: true, streak: 0, unit, target }
+        );
+    },
+
+    // Actualizar un hábito (nombre, meta, etc.)
+    async updateHabit(documentId: string, data: Partial<{ name: string; active: boolean; target: number }>) {
+        return await databases.updateDocument(
+            DB_ID,
+            COLLECTIONS.HABITS,
+            documentId,
+            data
+        );
+    },
+
+    // Eliminar un hábito
+    async deleteHabit(documentId: string) {
+        return await databases.deleteDocument(
+            DB_ID,
+            COLLECTIONS.HABITS,
+            documentId
+        );
+    },
+
+    // Obtener todos los logs de hábitos del usuario
+    async getAllHabitLogs(userId: string) {
+        return await databases.listDocuments(
+            DB_ID,
+            COLLECTIONS.HABITS_LOG,
+            [Query.equal("userId", userId), Query.orderDesc("date")]
+        );
+    },
+
+    // Eliminar todos los logs de un hábito
+    async deleteHabitLogs(habitId: string, userId: string) {
+        const logs = await databases.listDocuments(
+            DB_ID,
+            COLLECTIONS.HABITS_LOG,
+            [Query.equal("habitId", habitId), Query.equal("userId", userId)]
+        );
+        for (const log of logs.documents) {
+            await databases.deleteDocument(DB_ID, COLLECTIONS.HABITS_LOG, log.$id);
+        }
+    }
 };
 
 // --- SERVICIO DE NOTAS ---
@@ -98,7 +222,7 @@ export const taskService = {
 };
 
 
-// --- SERVICIO DE HABITOS ---
+/* // --- SERVICIO DE HABITOS ---
 export const habitService = {
   async createHabit(userId: string, name: string) {
     return await databases.createDocument(
@@ -133,7 +257,7 @@ export const habitService = {
       documentId
     );
   }
-};
+}; */
 
 // --- SERVICIO DE OBJETIVOS ---
 export const goalService = {
