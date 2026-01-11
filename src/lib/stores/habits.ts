@@ -153,87 +153,139 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     }
   },
 
-  toggleBooleanHabit: async (habitId: string, date: string, userId: string) => {
-    const { habitLogs } = get();
-    const habit = get().habits.find((h) => h.$id === habitId);
-    if (!habit || habit.type !== "boolean") return;
+   toggleBooleanHabit: async (habitId: string, date: string, userId: string) => {
+     const { habitLogs } = get();
+     const habit = get().habits.find((h) => h.$id === habitId);
+     if (!habit || habit.type !== "boolean") return;
 
-    const logs = habitLogs[habitId] || [];
-    const existingLog = logs.find((l) => normalizeDate(l.date) === date);
-    const wasCompleted = existingLog?.completed || false;
-    const newValue = existingLog ? (existingLog.value === 1 ? 0 : 1) : 1;
-    const completed = newValue === 1;
+     const logs = habitLogs[habitId] || [];
+     const existingLog = logs.find((l) => normalizeDate(l.date) === date);
 
-    const tempId = existingLog ? existingLog.$id : `temp_${Date.now()}`;
+     let action: 'create' | 'update' | 'delete';
+     let newValue: number | undefined;
+     let completed: boolean | undefined;
 
-    // Optimistic update
-    const newLog: HabitLog = {
-      $id: tempId,
-      habitId,
-      userId,
-      date,
-      value: newValue,
-      completed,
-    };
+     if (!existingLog) {
+       // null => true
+       action = 'create';
+       newValue = 1;
+       completed = true;
+     } else if (existingLog.completed) {
+       // true => false
+       action = 'update';
+       newValue = 0;
+       completed = false;
+     } else {
+       // false => null
+       action = 'delete';
+     }
 
-    set((state) => {
-      const currentLogs = state.habitLogs[habitId] || [];
-      return {
-        habitLogs: {
-          ...state.habitLogs,
-          [habitId]: currentLogs.filter((l) => normalizeDate(l.date) !== date).concat(newLog),
-        },
-      };
-    });
+     const tempId = existingLog ? existingLog.$id : `temp_${Date.now()}`;
+     const wasCompleted = existingLog?.completed || false;
 
-    try {
-      if (existingLog) {
-        // Update existing log
-        await databases.updateDocument(
-          DB_ID,
-          COLLECTIONS.HABITS_LOG,
-          existingLog.$id,
-          { value: newValue, completed }
-        );
-      } else {
-        // Create new log
-        const createdLog = await habitService.createLog(
-          habitId,
-          userId,
-          date,
-          newValue,
-          completed
-        );
-        // Update with real ID
-        set((state) => {
-          const currentLogs = state.habitLogs[habitId] || [];
-          const updatedLog = { ...newLog, $id: createdLog.$id };
-          return {
-            habitLogs: {
-              ...state.habitLogs,
-              [habitId]: currentLogs.filter((l) => l.$id !== tempId).concat(updatedLog),
-            },
-          };
-        });
-      }
+     // Optimistic update
+     if (action === 'delete') {
+       set((state) => {
+         const currentLogs = state.habitLogs[habitId] || [];
+         return {
+           habitLogs: {
+             ...state.habitLogs,
+             [habitId]: currentLogs.filter((l) => l.$id !== existingLog!.$id),
+           },
+         };
+       });
+     } else {
+       const newLog: HabitLog = {
+         $id: tempId,
+         habitId,
+         userId,
+         date,
+         value: newValue!,
+         completed: completed!,
+       };
+       set((state) => {
+         const currentLogs = state.habitLogs[habitId] || [];
+         return {
+           habitLogs: {
+             ...state.habitLogs,
+             [habitId]: currentLogs.filter((l) => normalizeDate(l.date) !== date).concat(newLog),
+           },
+         };
+       });
+     }
 
-      if (completed && !wasCompleted) {
-        addXP(15);
-      }
-    } catch (error) {
-      console.error("Error toggling habit:", error);
-      // Revert optimistic update
-      set((state) => {
-        const currentLogs = state.habitLogs[habitId] || [];
-        return {
-          habitLogs: {
-            ...state.habitLogs,
-            [habitId]: currentLogs.filter((l) => l.$id !== tempId),
-          },
-        };
-      });
-    }
-  },
+     try {
+       if (action === 'delete') {
+         await databases.deleteDocument(
+           DB_ID,
+           COLLECTIONS.HABITS_LOG,
+           existingLog!.$id
+         );
+       } else if (action === 'update') {
+         await databases.updateDocument(
+           DB_ID,
+           COLLECTIONS.HABITS_LOG,
+           existingLog!.$id,
+           { value: newValue, completed }
+         );
+       } else {
+         // create
+         const createdLog = await habitService.createLog(
+           habitId,
+           userId,
+           date,
+           newValue!,
+           completed!
+         );
+         // Update with real ID
+         set((state) => {
+           const currentLogs = state.habitLogs[habitId] || [];
+           const updatedLog: HabitLog = {
+             $id: createdLog.$id,
+             habitId,
+             userId,
+             date,
+             value: newValue!,
+             completed: completed!,
+           };
+           return {
+             habitLogs: {
+               ...state.habitLogs,
+               [habitId]: currentLogs.filter((l) => l.$id !== tempId).concat(updatedLog),
+             },
+           };
+         });
+       }
+
+       if (completed! && !wasCompleted) {
+         addXP(15);
+       }
+     } catch (error) {
+       console.error("Error toggling habit:", error);
+       // Revert optimistic update
+       if (action === 'delete') {
+         set((state) => {
+           const currentLogs = state.habitLogs[habitId] || [];
+           return {
+             habitLogs: {
+               ...state.habitLogs,
+               [habitId]: currentLogs.concat(existingLog!),
+             },
+           };
+         });
+       } else {
+         set((state) => {
+           const currentLogs = state.habitLogs[habitId] || [];
+           return {
+             habitLogs: {
+               ...state.habitLogs,
+               [habitId]: currentLogs.filter((l) => l.$id !== tempId),
+             },
+           };
+         });
+       }
+     }
+   },
 
   saveLogValue: async (habitId: string, date: string, value: number, userId: string) => {
     const { habitLogs } = get();

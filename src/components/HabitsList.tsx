@@ -8,6 +8,7 @@ import {
   ChevronUp,
   ChevronDown,
   Trash2,
+  X,
 } from "lucide-react";
 import { cn, normalizeDate } from "@/lib/utils";
 
@@ -26,7 +27,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-// Definimos la fecha fuera para uso general si es necesario
 const TODAY_STR = new Date().toISOString().split("T")[0];
 
 export function HabitsList() {
@@ -126,10 +126,11 @@ export function HabitsList() {
     setIsLogDialogOpen(true);
   };
 
-  // Get last 7 days
-  const lastSevenDays = Array.from({ length: 7 })
+  // Get last 9 days
+  const todayDate = new Date(TODAY_STR + "T00:00:00");
+  const lastSevenDays = Array.from({ length: 9 })
     .map((_, i) => {
-      const d = new Date();
+      const d = new Date(todayDate);
       d.setDate(d.getDate() - i);
       return d.toISOString().split("T")[0];
     })
@@ -161,7 +162,8 @@ export function HabitsList() {
                     id="habit-name"
                     value={newHabit.name}
                     onChange={(e) => setNewHabit({ name: e.target.value })}
-                    placeholder="Ej: Hacer ejercicio"
+                     placeholder="Ej: Hacer ejercicio"
+                     className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -179,8 +181,24 @@ export function HabitsList() {
                     <option value="boolean">Sí/No (Completado)</option>
                     <option value="count">Contador (Con meta)</option>
                   </select>
-                </div>
-                {newHabit.type === "count" && (
+                 </div>
+                 <div>
+                   <Label htmlFor="habit-frequency">Frecuencia</Label>
+                   <select
+                     id="habit-frequency"
+                     value={newHabit.frequency}
+                     onChange={(e) =>
+                       setNewHabit({
+                         frequency: e.target.value as "daily" | "weekly",
+                       })
+                     }
+                     className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   >
+                     <option value="daily">Diario</option>
+                     <option value="weekly">Semanal</option>
+                   </select>
+                 </div>
+                 {newHabit.type === "count" && (
                   <>
                     <div>
                       <Label htmlFor="habit-unit">Unidad</Label>
@@ -188,7 +206,8 @@ export function HabitsList() {
                         id="habit-unit"
                         value={newHabit.unit}
                         onChange={(e) => setNewHabit({ unit: e.target.value })}
-                        placeholder="Ej: minutos, km, vasos"
+                         placeholder="Ej: minutos, km, vasos"
+                         className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
@@ -200,7 +219,8 @@ export function HabitsList() {
                         onChange={(e) =>
                           setNewHabit({ target: parseInt(e.target.value) || 0 })
                         }
-                        placeholder="Ej: 30"
+                         placeholder="Ej: 30"
+                         className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                   </>
@@ -218,7 +238,7 @@ export function HabitsList() {
         {/* Calendario Común */}
         <div className="grid grid-cols-7 md:grid-cols-12 mb-6 items-center">
           <div className="hidden">{/* espacio para el numero de semana */}</div>
-          <div className="col-span-full md:col-start-6 md:col-span-7 grid grid-cols-7 grid-rows-1 gap-2">
+          <div className="col-span-full md:col-start-6 md:col-span-7 grid grid-cols-9 grid-rows-1 gap-2">
             {lastSevenDays.map((date) => {
               const dateObj = new Date(date + "T00:00:00");
               const dayName = dateObj.toLocaleDateString("es-ES", {
@@ -320,48 +340,146 @@ export function HabitsList() {
                     </div>
                   </div>
 
-                  <div className="col-span-full md:col-start-6 grid grid-cols-7 gap-2">
-                    {lastSevenDays.map((date) => {
-                      const log = logs.find(
-                        (l) => normalizeDate(l.date) === date
-                      );
+                  <div className="col-span-full md:col-start-6 grid grid-cols-9 gap-2">
+                    {habit.frequency === "weekly"
+                      ? (() => {
+                          // Get last 2 Mondays
+                          const today = new Date(TODAY_STR + "T00:00:00");
+                          const currentMonday = new Date(today);
+                          const day = currentMonday.getDay();
+                          currentMonday.setDate(
+                            currentMonday.getDate() - (day === 0 ? 6 : day - 1)
+                          ); // Monday of current week
+                          const currentMondayStr = currentMonday
+                            .toISOString()
+                            .split("T")[0];
 
-                      const isCountHabit = habit.type === "count";
-                      const logValue = log?.value;
-                      const isCompleted = isCountHabit
-                        ? (logValue || 0) >= (habit.target || 0)
-                        : log?.completed || false;
-                      const showValue = isCountHabit && logValue !== undefined;
-                      const isToday = date === TODAY_STR;
+                          const prevMonday = new Date(currentMonday);
+                          prevMonday.setDate(prevMonday.getDate() - 7);
+                          const prevMondayStr = prevMonday
+                            .toISOString()
+                            .split("T")[0];
 
-                      return (
-                        <div
-                          key={date}
-                          className={cn(
-                            "flex items-center justify-center h-12 rounded-lg border-2 cursor-pointer transition-all",
-                            isCompleted
-                              ? "bg-primary border-primary text-primary-foreground"
-                              : isToday
-                              ? "border-primary/50 hover:border-primary"
-                              : "border-border hover:border-primary/50",
-                            "hover:shadow-md"
-                          )}
-                          onClick={() =>
-                            habit.type === "boolean"
-                              ? handleToggleBooleanHabit(habit.$id, date)
-                              : handleOpenLogDialog(habit.$id, date)
-                          }
-                        >
-                          {showValue ? (
-                            <span className="text-sm font-semibold">
-                              {logValue}
-                            </span>
-                          ) : isCompleted ? (
-                            <CheckCircle2 className="h-5 w-5" />
-                          ) : null}
-                        </div>
-                      );
-                    })}
+                          const mondays = [prevMondayStr, currentMondayStr];
+
+                          return mondays.map((mondayStr) => {
+                            const monday = new Date(mondayStr + "T00:00:00");
+                            const sunday = new Date(monday);
+                            sunday.setDate(monday.getDate() + 6);
+                            const sundayStr = sunday
+                              .toISOString()
+                              .split("T")[0];
+
+                            const mondayIndex =
+                              lastSevenDays.indexOf(mondayStr);
+                            const sundayIndex =
+                              lastSevenDays.indexOf(sundayStr);
+
+                            const startIndex =
+                              mondayIndex >= 0 ? mondayIndex : 0;
+                            const endIndex =
+                              sundayIndex >= 0
+                                ? sundayIndex
+                                : lastSevenDays.length - 1;
+
+                            if (startIndex > endIndex) return null;
+
+                            const colStart = startIndex + 1;
+                            const colSpan = endIndex - startIndex + 1;
+
+                            const log = logs.find(
+                              (l) => normalizeDate(l.date) === mondayStr
+                            );
+
+                            const isCountHabit = habit.type === "count";
+                            const logValue = log?.value;
+                            const isCompleted = isCountHabit
+                              ? (logValue || 0) >= (habit.target || 0)
+                              : log?.completed || false;
+                            const hasLog = log != null;
+
+                            return (
+                              <div
+                                key={mondayStr}
+                                className={cn(
+                                  "flex items-center justify-center h-12 rounded-lg border-2 cursor-pointer transition-all",
+                                  isCompleted
+                                    ? "bg-primary border-primary text-primary-foreground"
+                                    : hasLog && !isCompleted
+                                    ? "bg-red-500 border-red-500 text-white"
+                                    : "border-border hover:border-primary/50",
+                                  "hover:shadow-md"
+                                )}
+                                style={{
+                                  gridColumn: `${colStart} / ${
+                                    colStart + colSpan
+                                  }`,
+                                }}
+                                onClick={() =>
+                                  habit.type === "boolean"
+                                    ? handleToggleBooleanHabit(
+                                        habit.$id,
+                                        mondayStr
+                                      )
+                                    : handleOpenLogDialog(habit.$id, mondayStr)
+                                }
+                              >
+                                {isCountHabit && logValue !== undefined ? (
+                                  <span className="text-sm font-semibold">
+                                    {logValue}
+                                  </span>
+                                ) : isCompleted ? (
+                                  <CheckCircle2 className="h-5 w-5" />
+                                ) : hasLog && !isCompleted ? (
+                                  <X className="h-5 w-5" />
+                                ) : null}
+                              </div>
+                            );
+                          });
+                        })()
+                      : lastSevenDays.map((date) => {
+                          const log = logs.find(
+                            (l) => normalizeDate(l.date) === date
+                          );
+
+                          const isCountHabit = habit.type === "count";
+                          const logValue = log?.value;
+                          const isCompleted = isCountHabit
+                            ? (logValue || 0) >= (habit.target || 0)
+                            : log?.completed || false;
+
+                          const hasLog = log != null;
+
+                          return (
+                            <div
+                              key={date}
+                              className={cn(
+                                "flex items-center justify-center h-12 rounded-lg border-2 cursor-pointer transition-all",
+                                isCompleted
+                                  ? "bg-primary border-primary text-primary-foreground"
+                                  : hasLog && !isCompleted
+                                  ? "bg-red-500 border-red-500 text-white"
+                                  : "border-border hover:border-primary/50",
+                                "hover:shadow-md"
+                              )}
+                              onClick={() =>
+                                habit.type === "boolean"
+                                  ? handleToggleBooleanHabit(habit.$id, date)
+                                  : handleOpenLogDialog(habit.$id, date)
+                              }
+                            >
+                              {isCountHabit && logValue !== undefined ? (
+                                <span className="text-sm font-semibold">
+                                  {logValue}
+                                </span>
+                              ) : isCompleted ? (
+                                <CheckCircle2 className="h-5 w-5" />
+                              ) : hasLog && !isCompleted ? (
+                                <X className="h-5 w-5" />
+                              ) : null}
+                            </div>
+                          );
+                        })}
                   </div>
                 </div>
               );
